@@ -17,7 +17,7 @@ export default function AdminNoticiasPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    noticiasAPI.getAll({ limit: 50 }).then(setNoticias);
+    noticiasAPI.getAll().then(setNoticias);
   }, []);
 
   const handleSave = async () => {

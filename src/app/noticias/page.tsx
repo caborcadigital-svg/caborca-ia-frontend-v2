@@ -17,7 +17,7 @@ export default function NoticiasPage() {
 
   useEffect(() => {
     setIsLoading(true);
-    noticiasAPI.getAll({ limit: 20, categoria: categoria === 'todas' ? undefined : categoria })
+    noticiasAPI.getAll()
       .then(setNoticias)
       .finally(() => setIsLoading(false));
   }, [categoria]);

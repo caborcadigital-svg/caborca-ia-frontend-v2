@@ -15,7 +15,7 @@ export default function NegociosPage() {
 
   const buscar = (query = q, cat = categoria) => {
     setIsLoading(true);
-    negociosAPI.getAll({ q: query || undefined, categoria: cat === 'todos' ? undefined : cat })
+    negociosAPI.getAll()
       .then(setNegocios)
       .finally(() => setIsLoading(false));
   };

@@ -19,7 +19,7 @@ export default function AdminEventosPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    eventosAPI.getAll({ limit: 50 }).then(setEventos);
+    eventosAPI.getAll().then(setEventos);
   }, []);
 
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));

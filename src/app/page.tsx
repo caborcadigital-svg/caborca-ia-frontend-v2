@@ -28,10 +28,10 @@ export default function HomePage() {
   useEffect(() => {
     Promise.allSettled([
       climaAPI.getCurrent().then(setClima),
-      noticiasAPI.getAll({ limit: 4 }).then(setNoticias),
-      eventosAPI.getAll({ proximos: true, limit: 3 }).then(setEventos),
+      noticiasAPI.getAll().then(setNoticias),
+      eventosAPI.getAll().then(setEventos),
       reportesAPI.getAll().then(d => setReportes(d.slice(0, 3))),
-      deportesAPI.getPartidos({ limit: 3 }).then(setPartidos),
+      deportesAPI.getPartidos().then(setPartidos),
     ]);
   }, []);
 

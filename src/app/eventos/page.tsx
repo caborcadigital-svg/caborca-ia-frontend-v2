@@ -12,7 +12,7 @@ export default function EventosPage() {
 
   useEffect(() => {
     setIsLoading(true);
-    eventosAPI.getAll({ proximos: tab === 'proximos', limit: 30 })
+    eventosAPI.getAll()
       .then(setEventos)
       .finally(() => setIsLoading(false));
   }, [tab]);
