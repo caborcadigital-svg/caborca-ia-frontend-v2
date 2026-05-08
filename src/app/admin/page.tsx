@@ -6,7 +6,7 @@ import Link from 'next/link';
 import MainLayout from '../../MainLayout';
 import { adminAPI } from '../../lib/api';
 import { useAuthStore } from '../../hooks/useAuth';
-import { Newspaper, CalendarDays, AlertTriangle, Trophy, Users, Plus, Check, X } from 'lucide-react';
+import { Newspaper, CalendarDays, AlertTriangle, Trophy, Users, Store, Plus, Check, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminPage() {
@@ -63,7 +63,7 @@ export default function AdminPage() {
             ].map(s => (
               <div key={s.label} className="bg-white rounded-2xl p-4 border shadow-sm" style={{ borderColor: 'var(--border)' }}>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: s.bg }}>
-                  <s.icon className="w-4.5 h-4.5" style={{ color: s.color }} />
+                  <s.icon className="w-4 h-4" style={{ color: s.color }} />
                 </div>
                 <div className="text-2xl font-display font-bold" style={{ color: 'var(--desert-blue)' }}>{s.value}</div>
                 <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</div>
@@ -77,13 +77,14 @@ export default function AdminPage() {
             { href: '/admin/noticias', label: 'Noticias', desc: 'Publicar y administrar', icon: Newspaper, color: '#6B3FA0', bg: '#F3EEF9' },
             { href: '/admin/eventos', label: 'Eventos', desc: 'Crear y gestionar', icon: CalendarDays, color: '#4A7C59', bg: '#EEF5F0' },
             { href: '/admin/deportes', label: 'Deportes', desc: 'Partidos y resultados', icon: Trophy, color: '#E8823A', bg: '#FEF0E8' },
+            { href: '/admin/negocios', label: 'Negocios', desc: 'Directorio de negocios', icon: Store, color: '#2D5F8A', bg: '#EEF4F9' },
             { href: '/admin/reportes', label: 'Reportes', desc: 'Moderar ciudadanos', icon: AlertTriangle, color: '#C4622D', bg: '#FDF1EC' },
           ].map(item => (
             <Link key={item.href} href={item.href}
               className="bg-white rounded-2xl p-4 border shadow-sm hover:shadow-md transition-all group" style={{ borderColor: 'var(--border)' }}>
               <div className="flex items-center justify-between mb-3">
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: item.bg }}>
-                  <item.icon className="w-4.5 h-4.5" style={{ color: item.color }} />
+                  <item.icon className="w-4 h-4" style={{ color: item.color }} />
                 </div>
                 <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" style={{ color: 'var(--text-muted)' }} />
               </div>

@@ -5,10 +5,10 @@ import MainLayout from '../../MainLayout';
 import { adminAPI, noticiasAPI } from '../../../lib/api';
 import { Plus, Trash2, Edit, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ImageUpload from '../../../components/ImageUpload';
 
 const FORM_INIT = { titulo: '', contenido: '', resumen: '', imagen_url: '', categoria: 'general', link_externo: '' };
 const CATEGORIAS = ['general', 'seguridad', 'deportes', 'gobierno', 'cultura', 'economia'];
-
 const inp = "w-full rounded-xl px-4 py-3 text-sm outline-none border bg-white";
 const inpStyle = { borderColor: 'var(--border)', color: 'var(--text-primary)' };
 
@@ -42,6 +42,7 @@ export default function AdminNoticiasPage() {
   const handleEdit = (n: any) => {
     setForm({ titulo: n.titulo, contenido: n.contenido || '', resumen: n.resumen || '', imagen_url: n.imagen_url || '', categoria: n.categoria, link_externo: n.link_externo || '' });
     setEditId(n.id); setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id: string) => {
@@ -65,6 +66,7 @@ export default function AdminNoticiasPage() {
         {showForm && (
           <div className="bg-white rounded-2xl p-4 border shadow-sm space-y-3 animate-slide-up" style={{ borderColor: 'var(--border)' }}>
             <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{editId ? 'Editar noticia' : 'Nueva noticia'}</h3>
+            <ImageUpload value={form.imagen_url} onChange={v => setForm(f => ({ ...f, imagen_url: v }))} label="Imagen de la noticia" />
             <input type="text" placeholder="Título *" value={form.titulo} onChange={e => setForm(f => ({ ...f, titulo: e.target.value }))} className={inp} style={inpStyle} />
             <select value={form.categoria} onChange={e => setForm(f => ({ ...f, categoria: e.target.value }))} className={inp} style={inpStyle}>
               {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
@@ -73,7 +75,6 @@ export default function AdminNoticiasPage() {
               rows={2} className={inp + ' resize-none'} style={inpStyle} />
             <textarea placeholder="Contenido completo *" value={form.contenido} onChange={e => setForm(f => ({ ...f, contenido: e.target.value }))}
               rows={6} className={inp + ' resize-none'} style={inpStyle} />
-            <input type="url" placeholder="URL de imagen (opcional)" value={form.imagen_url} onChange={e => setForm(f => ({ ...f, imagen_url: e.target.value }))} className={inp} style={inpStyle} />
             <input type="url" placeholder="Link externo / fuente (opcional)" value={form.link_externo} onChange={e => setForm(f => ({ ...f, link_externo: e.target.value }))} className={inp} style={inpStyle} />
             <button onClick={handleSave} disabled={isSaving}
               className="w-full py-3 rounded-xl gradient-sunset text-white font-medium text-sm disabled:opacity-50 shadow-sm">

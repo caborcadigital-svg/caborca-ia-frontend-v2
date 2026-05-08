@@ -85,9 +85,11 @@ export const adminAPI = {
   actualizarNoticia: (id: string, data: object) => api.put(`/admin/noticias/${id}`, data).then(r => r.data),
   eliminarNoticia: (id: string) => api.delete(`/admin/noticias/${id}`).then(r => r.data),
   crearEvento: (data: object) => api.post('/admin/eventos', data).then(r => r.data),
+  actualizarEvento: (id: string, data: object) => api.put(`/admin/eventos/${id}`, data).then(r => r.data),
   eliminarEvento: (id: string) => api.delete(`/admin/eventos/${id}`).then(r => r.data),
   getReportesPendientes: () => api.get('/admin/reportes/pendientes').then(r => r.data),
   actualizarReporte: (id: string, estado: string) => api.put(`/admin/reportes/${id}/estado`, { estado }).then(r => r.data),
+  eliminarReporte: (id: string) => api.delete(`/admin/reportes/${id}`).then(r => r.data),
   crearPartido: (data: object) => api.post('/admin/deportes/partidos', data).then(r => r.data),
   actualizarPartido: (id: string, data: object) => api.put(`/admin/deportes/partidos/${id}`, data).then(r => r.data),
 };

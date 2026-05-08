@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import MainLayout from '../../MainLayout';
 import { adminAPI, deportesAPI } from '../../../lib/api';
-import { Plus, X, Edit } from 'lucide-react';
+import { Plus, X, Edit, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const FORM_INIT = { deporte: 'beisbol', liga: '', equipo_local: '', equipo_visitante: '', marcador_local: '', marcador_visitante: '', fecha: '', lugar: '', estado: 'programado' };
@@ -24,10 +24,16 @@ export default function AdminDeportesPage() {
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSave = async () => {
-    if (!form.equipo_local || !form.equipo_visitante || !form.fecha) { toast.error('Equipos y fecha requeridos'); return; }
+    if (!form.equipo_local || !form.equipo_visitante || !form.fecha) {
+      toast.error('Equipos y fecha requeridos'); return;
+    }
     setIsSaving(true);
     try {
-      const payload = { ...form, marcador_local: form.marcador_local !== '' ? parseInt(form.marcador_local) : null, marcador_visitante: form.marcador_visitante !== '' ? parseInt(form.marcador_visitante) : null };
+      const payload = {
+        ...form,
+        marcador_local: form.marcador_local !== '' ? parseInt(form.marcador_local) : null,
+        marcador_visitante: form.marcador_visitante !== '' ? parseInt(form.marcador_visitante) : null,
+      };
       if (editId) {
         const updated = await adminAPI.actualizarPartido(editId, payload);
         setPartidos(prev => prev.map(p => p.id === editId ? updated : p));
@@ -40,6 +46,21 @@ export default function AdminDeportesPage() {
       setForm(FORM_INIT); setShowForm(false); setEditId(null);
     } catch { toast.error('Error guardando partido'); }
     finally { setIsSaving(false); }
+  };
+
+  const handleEdit = (p: any) => {
+    setForm({ deporte: p.deporte, liga: p.liga || '', equipo_local: p.equipo_local, equipo_visitante: p.equipo_visitante, marcador_local: p.marcador_local ?? '', marcador_visitante: p.marcador_visitante ?? '', fecha: p.fecha?.slice(0, 16) || '', lugar: p.lugar || '', estado: p.estado });
+    setEditId(p.id); setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('¿Eliminar este partido?')) return;
+    try {
+      await adminAPI.actualizarPartido(id, { estado: 'cancelado' });
+      setPartidos(prev => prev.filter(p => p.id !== id));
+      toast.success('Partido eliminado');
+    } catch { toast.error('Error eliminando'); }
   };
 
   return (
@@ -56,6 +77,7 @@ export default function AdminDeportesPage() {
 
         {showForm && (
           <div className="bg-white rounded-2xl p-4 border shadow-sm space-y-3 animate-slide-up" style={{ borderColor: 'var(--border)' }}>
+            <h3 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{editId ? 'Editar partido' : 'Nuevo partido'}</h3>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs mb-1 block font-medium" style={{ color: 'var(--text-secondary)' }}>Deporte</label>
@@ -121,11 +143,13 @@ export default function AdminDeportesPage() {
                     style={{ color: p.estado === 'finalizado' ? 'var(--text-muted)' : p.estado === 'en_curso' ? '#16a34a' : 'var(--terracotta)', background: p.estado === 'finalizado' ? '#f3f4f6' : p.estado === 'en_curso' ? '#f0fdf4' : '#fef0ec' }}>
                     {p.estado}
                   </span>
-                  <button onClick={() => {
-                    setForm({ deporte: p.deporte, liga: p.liga || '', equipo_local: p.equipo_local, equipo_visitante: p.equipo_visitante, marcador_local: p.marcador_local ?? '', marcador_visitante: p.marcador_visitante ?? '', fecha: p.fecha?.slice(0, 16) || '', lugar: p.lugar || '', estado: p.estado });
-                    setEditId(p.id); setShowForm(true);
-                  }} className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center border border-blue-100">
+                  <button onClick={() => handleEdit(p)}
+                    className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center border border-blue-100">
                     <Edit className="w-3 h-3" />
+                  </button>
+                  <button onClick={() => handleDelete(p.id)}
+                    className="w-7 h-7 rounded-lg bg-red-50 text-red-500 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center border border-red-100">
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               </div>
