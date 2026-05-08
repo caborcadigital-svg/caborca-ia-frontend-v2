@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '../../../hooks/useAuth';
 import { authAPI } from '../../../lib/api';
-import { Zap, Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -28,9 +28,7 @@ export default function LoginPage() {
       router.push('/admin');
     } catch (err: any) {
       toast.error(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+    } finally { setIsLoading(false); }
   };
 
   const handleRegistro = async () => {
@@ -46,32 +44,39 @@ export default function LoginPage() {
       router.push('/admin');
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Error al registrarse');
-    } finally {
-      setIsLoading(false);
-    }
+    } finally { setIsLoading(false); }
   };
 
+  const inputClass = "w-full rounded-xl px-4 py-3 text-sm outline-none border transition-colors bg-white"
+
   return (
-    <div className="min-h-screen bg-surface-950 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--sand)' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center mx-auto mb-4 shadow-2xl shadow-brand-600/30">
-            <Zap className="w-7 h-7 text-white" />
+          <div className="w-20 h-20 rounded-3xl overflow-hidden mx-auto mb-4 shadow-xl bg-white p-2">
+            <img src="/logo.png" alt="Caborca IA" className="w-full h-full object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.parentElement!.className = 'w-20 h-20 rounded-3xl gradient-desert-hero flex items-center justify-center mx-auto mb-4 shadow-xl';
+              }}
+            />
           </div>
-          <h1 className="font-display text-2xl font-bold text-white">Caborca IA</h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <h1 className="font-display text-2xl font-bold" style={{ color: 'var(--desert-blue)' }}>Caborca IA</h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
             {modo === 'login' ? 'Inicia sesión para continuar' : 'Crea tu cuenta'}
           </p>
         </div>
 
-        <div className="glass rounded-3xl p-8 space-y-5">
-          <div className="flex rounded-xl overflow-hidden border border-surface-600">
+        <div className="card-desert rounded-3xl p-8 space-y-5">
+          <div className="flex rounded-xl overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
             <button onClick={() => setModo('login')}
-              className={`flex-1 py-2.5 text-sm font-medium transition-all ${modo === 'login' ? 'gradient-brand text-white' : 'text-slate-400 hover:text-white'}`}>
+              className={`flex-1 py-2.5 text-sm font-medium transition-all ${modo === 'login' ? 'gradient-sunset text-white' : 'text-secondary hover:bg-sand'}`}
+              style={modo !== 'login' ? { color: 'var(--text-secondary)' } : {}}>
               Iniciar sesión
             </button>
             <button onClick={() => setModo('registro')}
-              className={`flex-1 py-2.5 text-sm font-medium transition-all ${modo === 'registro' ? 'gradient-brand text-white' : 'text-slate-400 hover:text-white'}`}>
+              className={`flex-1 py-2.5 text-sm font-medium transition-all ${modo === 'registro' ? 'gradient-sunset text-white' : ''}`}
+              style={modo !== 'registro' ? { color: 'var(--text-secondary)' } : {}}>
               Registrarse
             </button>
           </div>
@@ -79,35 +84,31 @@ export default function LoginPage() {
           {modo === 'login' ? (
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-slate-400 mb-1.5 block">Usuario o correo electrónico</label>
-                <input
-                  type="text"
-                  placeholder="usuario o correo@ejemplo.com"
+                <label className="text-xs mb-1.5 block font-medium" style={{ color: 'var(--text-secondary)' }}>Usuario o correo electrónico</label>
+                <input type="text" placeholder="usuario o correo@ejemplo.com"
                   value={loginForm.identificador}
                   onChange={e => setLoginForm(f => ({ ...f, identificador: e.target.value }))}
                   onKeyDown={e => e.key === 'Enter' && handleLogin()}
-                  className="w-full bg-surface-800 border border-surface-600 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-brand-500 placeholder:text-slate-500"
-                />
+                  className={inputClass}
+                  style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
               </div>
               <div>
-                <label className="text-xs text-slate-400 mb-1.5 block">Contraseña</label>
+                <label className="text-xs mb-1.5 block font-medium" style={{ color: 'var(--text-secondary)' }}>Contraseña</label>
                 <div className="relative">
-                  <input
-                    type={showPass ? 'text' : 'password'}
-                    placeholder="••••••••"
+                  <input type={showPass ? 'text' : 'password'} placeholder="••••••••"
                     value={loginForm.password}
                     onChange={e => setLoginForm(f => ({ ...f, password: e.target.value }))}
                     onKeyDown={e => e.key === 'Enter' && handleLogin()}
-                    className="w-full bg-surface-800 border border-surface-600 rounded-xl px-4 py-3 pr-11 text-white text-sm outline-none focus:border-brand-500 placeholder:text-slate-500"
-                  />
+                    className={inputClass + ' pr-11'}
+                    style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
                   <button type="button" onClick={() => setShowPass(!showPass)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                    className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }}>
                     {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
               <button onClick={handleLogin} disabled={isLoading}
-                className="w-full py-3 rounded-xl gradient-brand text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-brand-600/20">
+                className="w-full py-3 rounded-xl gradient-sunset text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg">
                 <LogIn className="w-4 h-4" />
                 {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
               </button>
@@ -115,45 +116,47 @@ export default function LoginPage() {
           ) : (
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-slate-400 mb-1.5 block">Nombre completo</label>
+                <label className="text-xs mb-1.5 block font-medium" style={{ color: 'var(--text-secondary)' }}>Nombre completo</label>
                 <input type="text" placeholder="Tu nombre" value={regForm.nombre}
                   onChange={e => setRegForm(f => ({ ...f, nombre: e.target.value }))}
-                  className="w-full bg-surface-800 border border-surface-600 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-brand-500 placeholder:text-slate-500" />
+                  className={inputClass} style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-slate-400 mb-1.5 block">Usuario</label>
+                  <label className="text-xs mb-1.5 block font-medium" style={{ color: 'var(--text-secondary)' }}>Usuario</label>
                   <input type="text" placeholder="usuario123" value={regForm.username}
                     onChange={e => setRegForm(f => ({ ...f, username: e.target.value }))}
-                    className="w-full bg-surface-800 border border-surface-600 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-brand-500 placeholder:text-slate-500" />
+                    className={inputClass} style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-400 mb-1.5 block">Correo electrónico</label>
+                  <label className="text-xs mb-1.5 block font-medium" style={{ color: 'var(--text-secondary)' }}>Correo electrónico</label>
                   <input type="email" placeholder="correo@ejemplo.com" value={regForm.email}
                     onChange={e => setRegForm(f => ({ ...f, email: e.target.value }))}
-                    className="w-full bg-surface-800 border border-surface-600 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-brand-500 placeholder:text-slate-500" />
+                    className={inputClass} style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
                 </div>
               </div>
               <div>
-                <label className="text-xs text-slate-400 mb-1.5 block">Contraseña</label>
+                <label className="text-xs mb-1.5 block font-medium" style={{ color: 'var(--text-secondary)' }}>Contraseña</label>
                 <div className="relative">
                   <input type={showPass ? 'text' : 'password'} placeholder="Mínimo 8 caracteres" value={regForm.password}
                     onChange={e => setRegForm(f => ({ ...f, password: e.target.value }))}
-                    className="w-full bg-surface-800 border border-surface-600 rounded-xl px-4 py-3 pr-11 text-white text-sm outline-none focus:border-brand-500 placeholder:text-slate-500" />
+                    className={inputClass + ' pr-11'} style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
                   <button type="button" onClick={() => setShowPass(!showPass)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                    className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }}>
                     {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
               <div>
-                <label className="text-xs text-slate-400 mb-1.5 block">Código de administrador <span className="text-slate-600">(opcional)</span></label>
+                <label className="text-xs mb-1.5 block font-medium" style={{ color: 'var(--text-secondary)' }}>
+                  Código de administrador <span style={{ color: 'var(--text-muted)' }}>(opcional)</span>
+                </label>
                 <input type="text" placeholder="Solo si tienes código admin" value={regForm.codigo_admin}
                   onChange={e => setRegForm(f => ({ ...f, codigo_admin: e.target.value }))}
-                  className="w-full bg-surface-800 border border-surface-600 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-brand-500 placeholder:text-slate-500" />
+                  className={inputClass} style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
               </div>
               <button onClick={handleRegistro} disabled={isLoading}
-                className="w-full py-3 rounded-xl gradient-brand text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg shadow-brand-600/20">
+                className="w-full py-3 rounded-xl gradient-sunset text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 shadow-lg">
                 <UserPlus className="w-4 h-4" />
                 {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
               </button>
@@ -162,7 +165,7 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center mt-6">
-          <Link href="/" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+          <Link href="/" className="text-sm transition-colors hover:underline" style={{ color: 'var(--text-muted)' }}>
             ← Volver al inicio
           </Link>
         </div>

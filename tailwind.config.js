@@ -4,24 +4,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        sand: { DEFAULT: '#F5EDD8', dark: '#EDE0C4', darker: '#D9CBA8' },
+        terracotta: { DEFAULT: '#C4622D', light: '#E8823A' },
+        sunset: { orange: '#E8823A', coral: '#E05C3A', purple: '#6B3FA0' },
+        desert: { blue: '#1E3A5F', mid: '#2D5F8A', sky: '#4A90C4' },
+        cactus: '#4A7C59',
         brand: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          900: '#1e3a8a',
+          DEFAULT: '#E05C3A',
+          50: '#FEF3EE',
+          100: '#FDE0D0',
+          500: '#E05C3A',
+          600: '#C4622D',
+          700: '#A3521F',
         },
-        surface: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
-        },
-        accent: '#f59e0b',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
@@ -30,11 +25,10 @@ module.exports = {
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         fadeIn: { from: { opacity: '0' }, to: { opacity: '1' } },
-        slideUp: { from: { opacity: '0', transform: 'translateY(10px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+        slideUp: { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
       },
     },
   },
