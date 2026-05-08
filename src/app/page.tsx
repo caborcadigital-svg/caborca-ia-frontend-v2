@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Cloud, Newspaper, CalendarDays, AlertTriangle, Trophy, Store, MessageSquare, TrendingUp, Zap } from 'lucide-react';
-import MainLayout from '../components/layout/MainLayout';
-import { climaAPI, noticiasAPI, eventosAPI, reportesAPI, deportesAPI } from '../../lib/api';
+import MainLayout from './MainLayout';
+import { climaAPI, noticiasAPI, eventosAPI, reportesAPI, deportesAPI } from '../lib/api';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
