@@ -3,9 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --sand: #E8D9B8;
-  --sand-dark: #DDD0A8;
-  --sand-darker: #C9BB90;
+--sand: #F0F2F5;
+--sand-dark: #E8E8E8;
+--sand-darker: #D8D8D8;
+--border: #E0E0E0;
   --terracotta: #C4622D;
   --sunset-orange: #E8823A;
   --sunset-coral: #E05C3A;
@@ -24,7 +25,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  background: var(--sand);
+  background: #F0F2F5;
   color: var(--text-primary);
   font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
