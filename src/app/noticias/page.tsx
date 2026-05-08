@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import MainLayout from '../MainLayout';
-import { noticiasAPI } from '../lib/api';
+import { noticiasAPI } from '../../lib/api';
 import { Newspaper, ExternalLink, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';

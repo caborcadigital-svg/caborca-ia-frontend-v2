@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import MainLayout from '../MainLayout';
-import { reportesAPI } from '../lib/api';
+import { reportesAPI } from '../../lib/api';
 import { AlertTriangle, Plus, X, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
