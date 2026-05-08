@@ -13,7 +13,7 @@ export default function DeportesPage() {
 
   useEffect(() => {
     Promise.all([
-      deportesAPI.getPartidos({ limit: 20 }).then(setPartidos),
+      deportesAPI.getPartidos().then(setPartidos),
       deportesAPI.getProximos().then(setProximos),
     ]).finally(() => setIsLoading(false));
   }, []);
