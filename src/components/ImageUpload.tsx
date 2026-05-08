@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { Upload, X, Loader2 } from 'lucide-react';
-import { subirImagen } from '../../lib/upload';
+import { subirImagen } from '../lib/upload';
 import toast from 'react-hot-toast';
 
 interface Props {
