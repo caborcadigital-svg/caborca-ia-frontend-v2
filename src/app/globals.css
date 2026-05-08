@@ -3,10 +3,9 @@
 @tailwind utilities;
 
 :root {
---sand: #F0F2F5;
---sand-dark: #E8E8E8;
---sand-darker: #D8D8D8;
---border: #E0E0E0;
+  --sand: #F0F2F5;
+  --sand-dark: #E8E8E8;
+  --sand-darker: #D8D8D8;
   --terracotta: #C4622D;
   --sunset-orange: #E8823A;
   --sunset-coral: #E05C3A;
@@ -17,9 +16,9 @@
   --cactus: #4A7C59;
   --text-primary: #1A1A2E;
   --text-secondary: #4A4A6A;
-  --text-muted: #7A7A9A;
-  --border: #C9BB90;
-  --surface: #FEFAF3;
+  --text-muted: #8A8AAA;
+  --border: #E0E0E0;
+  --surface: #FFFFFF;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
