@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import MainLayout from '../MainLayout';
+import MainLayout from '../../MainLayout';
 import { adminAPI } from '../../lib/api';
 import { useAuthStore } from '../../hooks/useAuth';
-import { Newspaper, CalendarDays, AlertTriangle, Trophy, Users, TrendingUp, Plus, Check, X } from 'lucide-react';
+import { Newspaper, CalendarDays, AlertTriangle, Trophy, Users, Plus, Check, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function AdminPage() {
@@ -16,16 +16,11 @@ export default function AdminPage() {
   const [reportesPendientes, setReportesPendientes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    loadFromStorage();
-  }, []);
+  useEffect(() => { loadFromStorage(); }, []);
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    if (user && user.role !== 'admin' && user.role !== 'superadmin') {
-      router.push('/');
-      return;
-    }
+    if (user && user.role !== 'admin' && user.role !== 'superadmin') { router.push('/'); return; }
     Promise.all([
       adminAPI.getStats().then(setStats),
       adminAPI.getReportesPendientes().then(setReportesPendientes),
@@ -37,16 +32,14 @@ export default function AdminPage() {
       await adminAPI.actualizarReporte(id, estado);
       setReportesPendientes(prev => prev.filter(r => r.id !== id));
       toast.success(`Reporte ${estado}`);
-    } catch {
-      toast.error('Error actualizando reporte');
-    }
+    } catch { toast.error('Error actualizando reporte'); }
   };
 
   if (!isAuthenticated || (user && user.role !== 'admin' && user.role !== 'superadmin')) {
     return (
       <MainLayout>
         <div className="flex items-center justify-center h-64">
-          <div className="text-slate-400">Acceso denegado</div>
+          <div className="text-sm" style={{ color: 'var(--text-muted)' }}>Acceso denegado</div>
         </div>
       </MainLayout>
     );
@@ -54,95 +47,73 @@ export default function AdminPage() {
 
   return (
     <MainLayout>
-      <div className="max-w-5xl mx-auto px-4 py-6 space-y-8">
+      <div className="max-w-4xl mx-auto px-3 py-4 space-y-5">
         <div>
-          <h1 className="font-display text-2xl font-bold text-white">Panel de Administración</h1>
-          <p className="text-slate-400 text-sm">Caborca IA — Control general de contenido</p>
+          <h1 className="font-display text-xl font-bold" style={{ color: 'var(--desert-blue)' }}>Panel de Administración</h1>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Caborca IA — Control general de contenido</p>
         </div>
 
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: 'Noticias', value: stats.noticias, icon: Newspaper, color: 'text-purple-400' },
-              { label: 'Eventos', value: stats.eventos, icon: CalendarDays, color: 'text-emerald-400' },
-              { label: 'Reportes pendientes', value: stats.reportes_pendientes, icon: AlertTriangle, color: 'text-amber-400' },
-              { label: 'Usuarios', value: stats.usuarios, icon: Users, color: 'text-brand-400' },
+              { label: 'Noticias', value: stats.noticias, icon: Newspaper, color: '#6B3FA0', bg: '#F3EEF9' },
+              { label: 'Eventos', value: stats.eventos, icon: CalendarDays, color: '#4A7C59', bg: '#EEF5F0' },
+              { label: 'Rep. pendientes', value: stats.reportes_pendientes, icon: AlertTriangle, color: '#C4622D', bg: '#FDF1EC' },
+              { label: 'Usuarios', value: stats.usuarios, icon: Users, color: '#2D5F8A', bg: '#EEF4F9' },
             ].map(s => (
-              <div key={s.label} className="glass rounded-2xl p-5">
-                <s.icon className={`w-6 h-6 ${s.color} mb-3`} />
-                <div className="text-3xl font-display font-bold text-white">{s.value}</div>
-                <div className="text-xs text-slate-400 mt-1">{s.label}</div>
+              <div key={s.label} className="bg-white rounded-2xl p-4 border shadow-sm" style={{ borderColor: 'var(--border)' }}>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: s.bg }}>
+                  <s.icon className="w-4.5 h-4.5" style={{ color: s.color }} />
+                </div>
+                <div className="text-2xl font-display font-bold" style={{ color: 'var(--desert-blue)' }}>{s.value}</div>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</div>
               </div>
             ))}
           </div>
         )}
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <Link href="/admin/noticias"
-            className="glass rounded-2xl p-6 hover:border-purple-600/30 transition-all group">
-            <div className="flex items-center justify-between mb-4">
-              <Newspaper className="w-8 h-8 text-purple-400" />
-              <Plus className="w-5 h-5 text-slate-500 group-hover:text-purple-400 transition-colors" />
-            </div>
-            <h3 className="font-display font-bold text-white text-lg">Gestionar Noticias</h3>
-            <p className="text-slate-400 text-sm mt-1">Publicar y administrar noticias locales</p>
-          </Link>
-
-          <Link href="/admin/eventos"
-            className="glass rounded-2xl p-6 hover:border-emerald-600/30 transition-all group">
-            <div className="flex items-center justify-between mb-4">
-              <CalendarDays className="w-8 h-8 text-emerald-400" />
-              <Plus className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 transition-colors" />
-            </div>
-            <h3 className="font-display font-bold text-white text-lg">Gestionar Eventos</h3>
-            <p className="text-slate-400 text-sm mt-1">Crear y administrar eventos de la comunidad</p>
-          </Link>
-
-          <Link href="/admin/deportes"
-            className="glass rounded-2xl p-6 hover:border-rose-600/30 transition-all group">
-            <div className="flex items-center justify-between mb-4">
-              <Trophy className="w-8 h-8 text-rose-400" />
-              <Plus className="w-5 h-5 text-slate-500 group-hover:text-rose-400 transition-colors" />
-            </div>
-            <h3 className="font-display font-bold text-white text-lg">Gestionar Deportes</h3>
-            <p className="text-slate-400 text-sm mt-1">Registrar partidos y resultados locales</p>
-          </Link>
-
-          <div className="glass rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <AlertTriangle className="w-8 h-8 text-amber-400" />
-              <span className="text-xs font-medium text-amber-400 bg-amber-400/10 px-2 py-1 rounded-full">
-                {reportesPendientes.length} pendientes
-              </span>
-            </div>
-            <h3 className="font-display font-bold text-white text-lg">Moderación de Reportes</h3>
-            <p className="text-slate-400 text-sm mt-1">Aprobar o rechazar reportes ciudadanos</p>
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {[
+            { href: '/admin/noticias', label: 'Noticias', desc: 'Publicar y administrar', icon: Newspaper, color: '#6B3FA0', bg: '#F3EEF9' },
+            { href: '/admin/eventos', label: 'Eventos', desc: 'Crear y gestionar', icon: CalendarDays, color: '#4A7C59', bg: '#EEF5F0' },
+            { href: '/admin/deportes', label: 'Deportes', desc: 'Partidos y resultados', icon: Trophy, color: '#E8823A', bg: '#FEF0E8' },
+            { href: '/admin/reportes', label: 'Reportes', desc: 'Moderar ciudadanos', icon: AlertTriangle, color: '#C4622D', bg: '#FDF1EC' },
+          ].map(item => (
+            <Link key={item.href} href={item.href}
+              className="bg-white rounded-2xl p-4 border shadow-sm hover:shadow-md transition-all group" style={{ borderColor: 'var(--border)' }}>
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: item.bg }}>
+                  <item.icon className="w-4.5 h-4.5" style={{ color: item.color }} />
+                </div>
+                <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" style={{ color: 'var(--text-muted)' }} />
+              </div>
+              <div className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>{item.label}</div>
+              <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{item.desc}</div>
+            </Link>
+          ))}
         </div>
 
         {reportesPendientes.length > 0 && (
           <div>
-            <h2 className="font-display text-lg font-bold text-white mb-4 flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-amber-400" />
-              Reportes pendientes de moderación
+            <h2 className="font-display text-base font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+              <AlertTriangle className="w-4 h-4" style={{ color: '#C4622D' }} />
+              Reportes pendientes ({reportesPendientes.length})
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {reportesPendientes.map(r => (
-                <div key={r.id} className="glass rounded-2xl p-4 flex items-start gap-4">
+                <div key={r.id} className="bg-white rounded-2xl p-4 border shadow-sm flex items-start gap-3" style={{ borderColor: 'var(--border)' }}>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-semibold text-amber-400 uppercase">{r.tipo}</span>
-                    </div>
-                    <p className="text-white text-sm">{r.descripcion}</p>
-                    <p className="text-slate-400 text-xs mt-1">📍 {r.ubicacion}</p>
+                    <div className="text-xs font-bold uppercase mb-1" style={{ color: 'var(--terracotta)' }}>{r.tipo}</div>
+                    <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{r.descripcion}</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>📍 {r.ubicacion}</p>
                   </div>
                   <div className="flex gap-2 shrink-0">
                     <button onClick={() => manejarReporte(r.id, 'aprobado')}
-                      className="w-9 h-9 rounded-xl bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center">
+                      className="w-9 h-9 rounded-xl flex items-center justify-center bg-green-50 hover:bg-green-600 hover:text-white transition-all border border-green-100 text-green-600">
                       <Check className="w-4 h-4" />
                     </button>
                     <button onClick={() => manejarReporte(r.id, 'rechazado')}
-                      className="w-9 h-9 rounded-xl bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center">
+                      className="w-9 h-9 rounded-xl flex items-center justify-center bg-red-50 hover:bg-red-600 hover:text-white transition-all border border-red-100 text-red-500">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
