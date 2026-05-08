@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 :root {
-  --sidebar-width: 270px;
   --sand: #F5EDD8;
   --sand-dark: #EDE0C4;
   --sand-darker: #D9CBA8;
@@ -18,14 +17,12 @@
   --text-primary: #1A1A2E;
   --text-secondary: #4A4A6A;
   --text-muted: #8A8AAA;
-  --border: #D9CBA8;
+  --border: #E5D9C0;
   --surface: #FEFAF3;
-  --surface-card: #FFFFFF;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-
 body {
   background: var(--sand);
   color: var(--text-primary);
@@ -33,34 +30,25 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--sand); }
-::-webkit-scrollbar-thumb { background: var(--sand-darker); border-radius: 3px; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--sand-darker); border-radius: 4px; }
 
 .prose-chat strong { color: var(--terracotta); font-weight: 600; }
-.prose-chat em { color: var(--text-secondary); }
 
 @layer utilities {
-  .glass-desert {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(196, 98, 45, 0.15);
-    box-shadow: 0 2px 16px rgba(107, 63, 160, 0.06);
-  }
-
   .card-desert {
     background: #FFFFFF;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 8px rgba(30, 58, 95, 0.06);
+    border: 1px solid #E5D9C0;
+    box-shadow: 0 1px 6px rgba(30, 58, 95, 0.06);
   }
 
   .gradient-sunset {
-    background: linear-gradient(135deg, var(--sunset-coral) 0%, var(--sunset-orange) 50%, #F5A623 100%);
+    background: linear-gradient(135deg, var(--sunset-coral) 0%, var(--sunset-orange) 100%);
   }
 
   .gradient-desert-hero {
-    background: linear-gradient(135deg, var(--desert-blue) 0%, var(--sunset-purple) 50%, var(--sunset-coral) 100%);
+    background: linear-gradient(135deg, var(--desert-blue) 0%, var(--sunset-purple) 55%, var(--sunset-coral) 100%);
   }
 
   .text-gradient-sunset {
@@ -71,12 +59,20 @@ body {
   }
 
   .sidebar-desert {
-    background: linear-gradient(180deg, var(--desert-blue) 0%, #162D4A 100%);
+    background: linear-gradient(180deg, #1E3A5F 0%, #162D4A 100%);
   }
 
   .nav-active {
     background: linear-gradient(135deg, var(--sunset-coral), var(--sunset-orange));
-    color: white;
-    box-shadow: 0 4px 12px rgba(224, 92, 58, 0.3);
+    color: white !important;
+    box-shadow: 0 3px 10px rgba(224, 92, 58, 0.3);
   }
 }
+
+@layer base {
+  .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+  .animate-slide-up { animation: slideUp 0.25s ease-out; }
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }

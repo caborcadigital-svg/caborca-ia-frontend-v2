@@ -21,6 +21,40 @@ const NAV = [
   { href: '/negocios', label: 'Negocios', icon: Store },
 ];
 
+function LogoIcon({ size = 36 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="lg1" cx="50%" cy="65%" r="60%">
+          <stop offset="0%" stopColor="#F5A623"/>
+          <stop offset="55%" stopColor="#E05C3A"/>
+          <stop offset="100%" stopColor="#6B3FA0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="44" r="36" fill="url(#lg1)"/>
+      <path d="M14 62 Q30 54 50 58 Q70 62 86 54 L86 80 Q70 76 50 78 Q30 80 14 74Z" fill="#1E0F3A" opacity="0.65"/>
+      <rect x="32" y="37" width="36" height="24" rx="2" fill="#1E0F3A" opacity="0.75"/>
+      <rect x="43" y="22" width="14" height="17" rx="2" fill="#1E0F3A" opacity="0.75"/>
+      <rect x="48" y="17" width="4" height="7" rx="1" fill="#1E0F3A" opacity="0.75"/>
+      <rect x="36" y="50" width="7" height="12" rx="1" fill="#E8823A" opacity="0.35"/>
+      <rect x="57" y="50" width="7" height="12" rx="1" fill="#E8823A" opacity="0.35"/>
+      <path d="M20 56 Q24 40 20 28 Q18 23 22 23 Q25 24 24 29 Q28 23 27 18" stroke="#4A7C59" strokeWidth="2.8" strokeLinecap="round" fill="none"/>
+      <path d="M24 40 Q19 38 17 40" stroke="#4A7C59" strokeWidth="2" strokeLinecap="round" fill="none"/>
+      <path d="M24 47 Q29 45 31 47" stroke="#4A7C59" strokeWidth="2" strokeLinecap="round" fill="none"/>
+      <ellipse cx="50" cy="80" rx="26" ry="9" fill="#1E0F3A" opacity="0.88"/>
+      <rect x="32" y="73" width="36" height="14" rx="7" fill="white"/>
+      <ellipse cx="43" cy="80" rx="3.5" ry="4.5" fill="#4A90C4"/>
+      <ellipse cx="57" cy="80" rx="3.5" ry="4.5" fill="#4A90C4"/>
+      <path d="M50 87 L47 96 L50 94 L53 96Z" fill="white"/>
+      <circle cx="72" cy="20" r="2.5" fill="white" opacity="0.85"/>
+      <circle cx="62" cy="13" r="1.8" fill="white" opacity="0.65"/>
+      <circle cx="79" cy="28" r="1.2" fill="white" opacity="0.55"/>
+    </svg>
+  );
+}
+
+export { LogoIcon };
+
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -32,29 +66,17 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: 'var(--sand)' }}>
-      <div
-        className={clsx(
-          'fixed inset-0 bg-black/40 z-20 lg:hidden transition-opacity',
-          open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        )}
-        onClick={() => setOpen(false)}
-      />
+      <div className={clsx('fixed inset-0 bg-black/40 z-20 lg:hidden transition-opacity',
+        open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      )} onClick={() => setOpen(false)} />
 
       <aside className={clsx(
-        'fixed top-0 left-0 h-full z-30 flex flex-col sidebar-desert',
-        'transition-transform duration-300 ease-in-out w-[270px]',
+        'fixed top-0 left-0 h-full z-30 flex flex-col sidebar-desert w-[260px]',
+        'transition-transform duration-300 ease-in-out',
         open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       )}>
-        <div className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
-          <div className="w-10 h-10 rounded-2xl overflow-hidden shrink-0 bg-white/10 flex items-center justify-center">
-            <img src="/logo.png" alt="Caborca IA" className="w-full h-full object-contain" 
-              onError={(e) => {
-                const t = e.currentTarget;
-                t.style.display = 'none';
-                t.parentElement!.innerHTML = '<svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 text-white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2"/></svg>';
-              }}
-            />
-          </div>
+        <div className="flex items-center gap-3 px-4 py-4 border-b border-white/10">
+          <LogoIcon size={40} />
           <div>
             <div className="font-display font-bold text-white text-base leading-tight">Caborca IA</div>
             <div className="text-xs text-white/50">Tu asistente inteligente</div>
@@ -64,21 +86,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
           {NAV.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || (href !== '/' && pathname.startsWith(href));
             return (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setOpen(false)}
-                className={clsx(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
-                  active
-                    ? 'nav-active'
-                    : 'text-white/60 hover:text-white hover:bg-white/10'
-                )}
-              >
+              <Link key={href} href={href} onClick={() => setOpen(false)}
+                className={clsx('flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+                  active ? 'nav-active' : 'text-white/60 hover:text-white hover:bg-white/10'
+                )}>
                 <Icon className="w-4 h-4 shrink-0" />
                 {label}
                 {active && <ChevronRight className="w-3 h-3 ml-auto opacity-70" />}
@@ -87,18 +102,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           })}
 
           {isAdmin && (
-            <div className="pt-3 mt-3 border-t border-white/10">
-              <p className="text-xs text-white/30 px-3 mb-2 font-medium uppercase tracking-wider">Admin</p>
-              <Link
-                href="/admin"
-                onClick={() => setOpen(false)}
-                className={clsx(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
-                  pathname.startsWith('/admin')
-                    ? 'bg-amber-500/20 text-amber-300'
-                    : 'text-white/60 hover:text-amber-300 hover:bg-amber-500/10'
-                )}
-              >
+            <div className="pt-2 mt-2 border-t border-white/10">
+              <p className="text-xs text-white/30 px-3 mb-1 font-medium uppercase tracking-wider">Admin</p>
+              <Link href="/admin" onClick={() => setOpen(false)}
+                className={clsx('flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+                  pathname.startsWith('/admin') ? 'bg-amber-500/20 text-amber-300' : 'text-white/60 hover:text-amber-300 hover:bg-amber-500/10'
+                )}>
                 <LayoutDashboard className="w-4 h-4 shrink-0" />
                 Panel Admin
               </Link>
@@ -106,7 +115,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           )}
         </nav>
 
-        <div className="px-3 py-4 border-t border-white/10">
+        <div className="px-2 py-3 border-t border-white/10">
           {isAuthenticated ? (
             <div className="flex items-center gap-3 px-3 py-2">
               <div className="w-8 h-8 rounded-full gradient-sunset flex items-center justify-center text-white text-sm font-bold shrink-0">
@@ -116,7 +125,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 <div className="text-sm font-medium text-white truncate">{user?.nombre}</div>
                 <div className="text-xs text-white/40 truncate">@{user?.username}</div>
               </div>
-              <button onClick={logout} className="text-white/40 hover:text-red-400 transition-colors" title="Cerrar sesión">
+              <button onClick={logout} className="text-white/40 hover:text-red-400 transition-colors">
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
@@ -130,17 +139,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-[270px]">
-        <header className="flex items-center gap-3 px-4 py-3 lg:hidden border-b sticky top-0 z-10 bg-white/80 backdrop-blur-sm" style={{ borderColor: 'var(--border)' }}>
+      <div className="flex-1 flex flex-col min-w-0 lg:pl-[260px]">
+        <header className="flex items-center gap-3 px-4 py-2.5 lg:hidden border-b sticky top-0 z-10 bg-white/90 backdrop-blur-sm" style={{ borderColor: 'var(--border)' }}>
           <button onClick={() => setOpen(true)} style={{ color: 'var(--desert-blue)' }}>
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg overflow-hidden">
-              <img src="/logo.png" alt="Caborca IA" className="w-full h-full object-contain"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-            </div>
+            <LogoIcon size={30} />
             <span className="font-display font-bold text-sm" style={{ color: 'var(--desert-blue)' }}>Caborca IA</span>
           </div>
         </header>
