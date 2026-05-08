@@ -1,4 +1,4 @@
-const UPLOAD_URL = 'https://caborca.app/upload.php';
+const UPLOAD_URL = 'https://uploads.caborca.app/upload.php';
 const UPLOAD_TOKEN = 'CABORCA_UPLOAD_2024_SECRETO';
 
 export async function subirImagen(archivo: File): Promise<string> {
