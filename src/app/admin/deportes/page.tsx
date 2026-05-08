@@ -22,7 +22,7 @@ export default function AdminDeportesPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    deportesAPI.getPartidos({ limit: 30 }).then(setPartidos);
+    deportesAPI.getPartidos().then(setPartidos);
   }, []);
 
   const handleSave = async () => {
