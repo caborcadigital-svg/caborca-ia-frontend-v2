@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import MainLayout from '../MainLayout';
-import { chatAPI } from '../lib/api';
-import { useAuthStore } from '../hooks/useAuth';
+import { chatAPI } from '../../lib/api';
+import { useAuthStore } from '../../hooks/useAuth';
 import { Send, Bot, User, Zap, Plus, Loader2 } from 'lucide-react';
 import clsx from 'clsx';
 import toast from 'react-hot-toast';

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import MainLayout from '../MainLayout';
-import { deportesAPI } from '../lib/api';
+import { deportesAPI } from '../../lib/api';
 import { Trophy, Calendar } from 'lucide-react';
 
 export default function DeportesPage() {

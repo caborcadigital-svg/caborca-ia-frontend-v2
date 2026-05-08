@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import MainLayout from '../MainLayout';
-import { eventosAPI } from '../lib/api';
+import { eventosAPI } from '../../lib/api';
 import { CalendarDays, MapPin, ExternalLink } from 'lucide-react';
 
 export default function EventosPage() {

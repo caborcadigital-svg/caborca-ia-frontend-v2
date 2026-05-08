@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import MainLayout from '../MainLayout';
-import { climaAPI } from '../lib/api';
+import { climaAPI } from '../../lib/api';
 import { Cloud, Wind, Droplets, Eye, Thermometer, ArrowUp, ArrowDown } from 'lucide-react';
 
 export default function ClimaPage() {
