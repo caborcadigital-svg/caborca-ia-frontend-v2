@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import {
   MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle,
-  Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight
+  Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone
 } from 'lucide-react';
 import { useAuthStore } from '../hooks/useAuth';
 import clsx from 'clsx';
@@ -19,6 +19,18 @@ const NAV = [
   { href: '/reportes', label: 'Reportes', icon: AlertTriangle },
   { href: '/deportes', label: 'Deportes', icon: Trophy },
   { href: '/negocios', label: 'Negocios', icon: Store },
+];
+
+const ADMIN_NAV = [
+  { href: '/admin', label: 'Panel Admin', icon: LayoutDashboard },
+  { href: '/admin/noticias', label: 'Noticias', icon: Newspaper },
+  { href: '/admin/eventos', label: 'Eventos', icon: CalendarDays },
+  { href: '/admin/deportes', label: 'Deportes', icon: Trophy },
+  { href: '/admin/negocios', label: 'Negocios', icon: Store },
+  { href: '/admin/reportes', label: 'Reportes', icon: AlertTriangle },
+  { href: '/admin/solicitudes', label: 'Solicitudes', icon: Store },
+  { href: '/admin/publicidad', label: 'Publicidad', icon: Megaphone },
+  { href: '/admin/sugerencias', label: 'Sugerencias Chat', icon: MessageSquare },
 ];
 
 function LogoIcon({ size = 36 }: { size?: number }) {
@@ -63,6 +75,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   useEffect(() => { loadFromStorage(); }, []);
 
   const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+  const enAdmin = pathname.startsWith('/admin');
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: 'var(--sand)' }}>
@@ -87,7 +100,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
 
         <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-          {NAV.map(({ href, label, icon: Icon }) => {
+          {!enAdmin && NAV.map(({ href, label, icon: Icon }) => {
             const active = pathname === href || (href !== '/' && pathname.startsWith(href));
             return (
               <Link key={href} href={href} onClick={() => setOpen(false)}
@@ -101,17 +114,40 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             );
           })}
 
-          {isAdmin && (
+          {isAdmin && !enAdmin && (
             <div className="pt-2 mt-2 border-t border-white/10">
               <p className="text-xs text-white/30 px-3 mb-1 font-medium uppercase tracking-wider">Admin</p>
               <Link href="/admin" onClick={() => setOpen(false)}
-                className={clsx('flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
-                  pathname.startsWith('/admin') ? 'bg-amber-500/20 text-amber-300' : 'text-white/60 hover:text-amber-300 hover:bg-amber-500/10'
-                )}>
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-white/60 hover:text-amber-300 hover:bg-amber-500/10">
                 <LayoutDashboard className="w-4 h-4 shrink-0" />
                 Panel Admin
               </Link>
             </div>
+          )}
+
+          {isAdmin && enAdmin && (
+            <>
+              <div className="px-3 mb-2">
+                <Link href="/" onClick={() => setOpen(false)}
+                  className="text-xs text-white/40 hover:text-white/70 flex items-center gap-1">
+                  ← Volver al sitio
+                </Link>
+              </div>
+              <p className="text-xs text-white/30 px-3 mb-1 font-medium uppercase tracking-wider">Admin</p>
+              {ADMIN_NAV.map(({ href, label, icon: Icon }) => {
+                const active = pathname === href || (href !== '/admin' && pathname.startsWith(href));
+                return (
+                  <Link key={href} href={href} onClick={() => setOpen(false)}
+                    className={clsx('flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+                      active ? 'bg-amber-500/20 text-amber-300' : 'text-white/60 hover:text-amber-300 hover:bg-amber-500/10'
+                    )}>
+                    <Icon className="w-4 h-4 shrink-0" />
+                    {label}
+                    {active && <ChevronRight className="w-3 h-3 ml-auto opacity-70" />}
+                  </Link>
+                );
+              })}
+            </>
           )}
         </nav>
 
@@ -146,7 +182,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </button>
           <div className="flex items-center gap-2">
             <LogoIcon size={30} />
-            <span className="font-display font-bold text-sm" style={{ color: 'var(--desert-blue)' }}>Caborca IA</span>
+            <span className="font-display font-bold text-sm" style={{ color: 'var(--desert-blue)' }}>
+              {enAdmin ? 'Admin' : 'Caborca IA'}
+            </span>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto">{children}</main>
