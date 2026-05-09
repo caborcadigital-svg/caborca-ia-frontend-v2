@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import MainLayout from '../../MainLayout';
+import MainLayout from '../MainLayout';
 import { adminAPI } from '../../lib/api';
 import { useAuthStore } from '../../hooks/useAuth';
 import { Newspaper, CalendarDays, AlertTriangle, Trophy, Users, Store, Plus, Check, X, TrendingUp, BarChart2 } from 'lucide-react';
