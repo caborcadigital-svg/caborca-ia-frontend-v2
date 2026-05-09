@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Cloud, Newspaper, CalendarDays, AlertTriangle, Trophy, Store, MessageSquare, Star, ChevronRight } from 'lucide-react';
 import MainLayout from './MainLayout';
 import PullToRefresh from '../components/PullToRefresh';
-import { climaAPI, noticiasAPI, eventosAPI, reportesAPI, deportesAPI, negociosAPI } from '../lib/api';
+import { climaAPI, noticiasAPI, eventosAPI, deportesAPI, negociosAPI } from '../lib/api';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -19,18 +19,13 @@ const ACCESOS = [
   { href: '/negocios', label: 'Negocios', icon: Store, color: '#2D5F8A', bg: '#EEF4F9' },
 ];
 
-const BANNERS_PUBLICITARIOS = [
-  { id: 1, titulo: '🍕 Pizza Caborca', subtitulo: 'Delivery en toda la ciudad · Tel: 638-100-0001', color: '#E05C3A', bg: '#FEF0EC' },
-  { id: 2, titulo: '🏪 Ferretería El Clavo', subtitulo: 'Materiales de construcción y más · Centro', color: '#2D5F8A', bg: '#EEF4F9' },
-  { id: 3, titulo: '💊 Farmacia San José', subtitulo: 'Medicamentos y atención 24hrs · Bulevar', color: '#4A7C59', bg: '#EEF5F0' },
-];
-
 export default function HomePage() {
   const [clima, setClima] = useState<any>(null);
   const [noticias, setNoticias] = useState<any[]>([]);
   const [eventos, setEventos] = useState<any[]>([]);
   const [partidos, setPartidos] = useState<any[]>([]);
   const [negociosDestacados, setNegociosDestacados] = useState<any[]>([]);
+  const [banners, setBanners] = useState<any[]>([]);
   const [bannerIdx, setBannerIdx] = useState(0);
 
   const cargarDatos = useCallback(async () => {
@@ -39,18 +34,23 @@ export default function HomePage() {
       noticiasAPI.getAll().then(d => setNoticias(d.slice(0, 3))),
       eventosAPI.getAll({ proximos: true }).then(d => setEventos(d.slice(0, 2))),
       deportesAPI.getPartidos().then(d => setPartidos(d.slice(0, 2))),
-      negociosAPI.getAll().then(d => setNegociosDestacados(d.slice(0, 4))),
+      negociosAPI.getAll().then(d => setNegociosDestacados(d.filter((n: any) => n.destacado).slice(0, 4))),
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/publicidad`)
+        .then(r => r.json())
+        .then(d => setBanners(Array.isArray(d) ? d.filter((b: any) => b.activo) : []))
+        .catch(() => {}),
     ]);
   }, []);
 
   useEffect(() => { cargarDatos(); }, []);
 
   useEffect(() => {
-    const t = setInterval(() => setBannerIdx(i => (i + 1) % BANNERS_PUBLICITARIOS.length), 4000);
+    if (banners.length <= 1) return;
+    const t = setInterval(() => setBannerIdx(i => (i + 1) % banners.length), 4000);
     return () => clearInterval(t);
-  }, []);
+  }, [banners.length]);
 
-  const banner = BANNERS_PUBLICITARIOS[bannerIdx];
+  const banner = banners[bannerIdx];
 
   return (
     <MainLayout>
@@ -79,20 +79,34 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Banner publicitario rotativo */}
-          <div className="rounded-2xl p-3 flex items-center justify-between gap-3 transition-all border"
-            style={{ background: banner.bg, borderColor: banner.color + '30' }}>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold" style={{ color: banner.color }}>{banner.titulo}</div>
-              <div className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{banner.subtitulo}</div>
+          {/* Banner publicitario desde Supabase */}
+          {banner && (
+            <div className="rounded-2xl p-3 flex items-center justify-between gap-3 transition-all border"
+              style={{ background: (banner.color || '#E05C3A') + '12', borderColor: (banner.color || '#E05C3A') + '30' }}>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                {banner.imagen_url && (
+                  <img src={banner.imagen_url} alt={banner.titulo} className="w-10 h-10 rounded-xl object-cover shrink-0" />
+                )}
+                <div className="min-w-0">
+                  <div className="text-xs font-bold truncate" style={{ color: banner.color || '#E05C3A' }}>{banner.titulo}</div>
+                  {banner.subtitulo && <div className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-secondary)' }}>{banner.subtitulo}</div>}
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                {banners.length > 1 && banners.map((_: any, i: number) => (
+                  <button key={i} onClick={() => setBannerIdx(i)}
+                    className="w-1.5 h-1.5 rounded-full transition-all"
+                    style={{ background: i === bannerIdx ? (banner.color || '#E05C3A') : '#D0D0D0' }} />
+                ))}
+                {banner.link_url && (
+                  <a href={banner.link_url} target="_blank" rel="noopener noreferrer"
+                    className="text-xs font-medium ml-1" style={{ color: banner.color || '#E05C3A' }}>
+                    Ver →
+                  </a>
+                )}
+              </div>
             </div>
-            <div className="flex items-center gap-1 shrink-0">
-              {BANNERS_PUBLICITARIOS.map((_, i) => (
-                <div key={i} className="w-1.5 h-1.5 rounded-full transition-all"
-                  style={{ background: i === bannerIdx ? banner.color : '#D0D0D0' }} />
-              ))}
-            </div>
-          </div>
+          )}
 
           {/* Accesos rápidos */}
           <div className="grid grid-cols-4 lg:grid-cols-7 gap-2">
@@ -108,7 +122,6 @@ export default function HomePage() {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-3">
-
             {/* Noticias */}
             <div className="lg:col-span-2 space-y-2">
               <div className="flex items-center justify-between">
@@ -206,24 +219,21 @@ export default function HomePage() {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {negociosDestacados.map(n => (
-                  <div key={n.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all">
+                  <Link key={n.id} href={`/negocios/${n.id}`}
+                    className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all block">
                     {n.imagen_url ? (
                       <img src={n.imagen_url} alt={n.nombre} className="w-full h-20 object-cover" />
                     ) : (
-                      <div className="w-full h-20 flex items-center justify-center" style={{ background: '#EEF4F9' }}>
-                        <Store className="w-8 h-8" style={{ color: '#2D5F8A' }} />
-                      </div>
+                      <div className="w-full h-20 flex items-center justify-center text-3xl" style={{ background: '#EEF4F9' }}>🏪</div>
                     )}
                     <div className="p-2.5">
                       <div className="text-xs font-bold line-clamp-1" style={{ color: 'var(--text-primary)' }}>{n.nombre}</div>
                       <div className="text-xs capitalize mt-0.5" style={{ color: 'var(--text-muted)' }}>{n.categoria}</div>
                       {n.telefono && (
-                        <a href={`tel:${n.telefono}`} className="text-xs mt-1 block font-medium" style={{ color: 'var(--terracotta)' }}>
-                          📞 {n.telefono}
-                        </a>
+                        <div className="text-xs mt-1 font-medium" style={{ color: 'var(--terracotta)' }}>📞 {n.telefono}</div>
                       )}
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
