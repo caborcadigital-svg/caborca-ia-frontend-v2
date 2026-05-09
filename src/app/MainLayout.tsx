@@ -5,9 +5,11 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import {
   MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle,
-  Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone
+  Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight,
+  Megaphone, Moon, Sun
 } from 'lucide-react';
 import { useAuthStore } from '../hooks/useAuth';
+import { useDarkMode } from '../hooks/useDarkMode';
 import clsx from 'clsx';
 
 const NAV = [
@@ -71,6 +73,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { user, isAuthenticated, logout, loadFromStorage } = useAuthStore();
+  const { dark, toggle } = useDarkMode();
 
   useEffect(() => { loadFromStorage(); }, []);
 
@@ -151,7 +154,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           )}
         </nav>
 
-        <div className="px-2 py-3 border-t border-white/10">
+        <div className="px-2 py-3 border-t border-white/10 space-y-2">
+          <button onClick={toggle}
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm font-medium transition-all text-white/60 hover:text-white hover:bg-white/10">
+            {dark ? <Sun className="w-4 h-4 shrink-0" /> : <Moon className="w-4 h-4 shrink-0" />}
+            {dark ? 'Modo claro' : 'Modo oscuro'}
+          </button>
+
           {isAuthenticated ? (
             <div className="flex items-center gap-3 px-3 py-2">
               <div className="w-8 h-8 rounded-full gradient-sunset flex items-center justify-center text-white text-sm font-bold shrink-0">
@@ -176,7 +185,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 lg:pl-[260px]">
-        <header className="flex items-center gap-3 px-4 py-2.5 lg:hidden border-b sticky top-0 z-10 bg-white/90 backdrop-blur-sm" style={{ borderColor: 'var(--border)' }}>
+        <header className="flex items-center gap-3 px-4 py-2.5 lg:hidden border-b sticky top-0 z-10 bg-white/90 backdrop-blur-sm dark:bg-gray-900/90" style={{ borderColor: 'var(--border)' }}>
           <button onClick={() => setOpen(true)} style={{ color: 'var(--desert-blue)' }}>
             <Menu className="w-5 h-5" />
           </button>
@@ -186,6 +195,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               {enAdmin ? 'Admin' : 'Caborca IA'}
             </span>
           </div>
+          <button onClick={toggle} className="ml-auto p-1.5 rounded-lg transition-all" style={{ color: 'var(--text-muted)' }}>
+            {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
         </header>
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>

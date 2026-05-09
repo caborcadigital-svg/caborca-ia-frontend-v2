@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import MainLayout from '../MainLayout';
 import { chatAPI } from '../../lib/api';
 import { useAuthStore } from '../../hooks/useAuth';
-import { Send, Bot, User, Plus, Loader2 } from 'lucide-react';
+import { Send, User, Plus, Loader2 } from 'lucide-react';
 import { LogoIcon } from '../MainLayout';
 import clsx from 'clsx';
 import toast from 'react-hot-toast';
@@ -42,9 +42,7 @@ export default function ChatPage() {
     if (isAuthenticated) chatAPI.getConversaciones().then(setConversaciones).catch(() => {});
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/sugerencias`)
       .then(r => r.json())
-      .then(data => {
-        if (data?.length) setSugerencias(data.map((s: any) => s.texto));
-      })
+      .then(data => { if (data?.length) setSugerencias(data.map((s: any) => s.texto)); })
       .catch(() => {});
   }, [isAuthenticated]);
 
@@ -74,9 +72,9 @@ export default function ChatPage() {
 
   return (
     <MainLayout>
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-0px)]" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 64px)' }}>
+      <div className="flex flex-col lg:flex-row" style={{ height: 'calc(100dvh - 52px)' }}>
         {isAuthenticated && conversaciones.length > 0 && (
-          <div className="hidden lg:flex flex-col w-52 border-r bg-white/70 shrink-0" style={{ borderColor: 'var(--border)' }}>
+          <div className="hidden lg:flex flex-col w-52 border-r shrink-0" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
             <div className="p-2 border-b" style={{ borderColor: 'var(--border)' }}>
               <button onClick={() => { setMessages([]); setConversacionId(null); }}
                 className="flex items-center gap-2 w-full px-3 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-gray-100"
@@ -98,7 +96,7 @@ export default function ChatPage() {
         )}
 
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
+          <div className="flex-1 overflow-y-auto p-3 space-y-3" style={{ paddingBottom: '8px' }}>
             {messages.length === 0 && (
               <div className="flex flex-col items-center justify-center min-h-full text-center px-4 py-8 animate-fade-in">
                 <div className="mb-4"><LogoIcon size={60} /></div>
@@ -109,8 +107,8 @@ export default function ChatPage() {
                 <div className="grid grid-cols-2 gap-2 w-full max-w-sm">
                   {sugerencias.slice(0, 6).map(s => (
                     <button key={s} onClick={() => enviar(s)}
-                      className="bg-white rounded-xl p-3 text-left text-xs border border-gray-100 shadow-sm hover:shadow-md transition-all hover:border-orange-200"
-                      style={{ color: 'var(--text-secondary)' }}>
+                      className="rounded-xl p-3 text-left text-xs border shadow-sm hover:shadow-md transition-all hover:border-orange-200"
+                      style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text-secondary)' }}>
                       {s}
                     </button>
                   ))}
@@ -127,15 +125,15 @@ export default function ChatPage() {
                   'max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
                   msg.rol === 'user'
                     ? 'gradient-sunset text-white rounded-tr-sm shadow-md'
-                    : 'bg-white border border-gray-100 shadow-sm rounded-tl-sm'
-                )} style={msg.rol === 'assistant' ? { color: 'var(--text-primary)' } : {}}>
+                    : 'border shadow-sm rounded-tl-sm'
+                )} style={msg.rol === 'assistant' ? { color: 'var(--text-primary)', background: 'var(--surface)', borderColor: 'var(--border)' } : {}}>
                   {msg.contenido.split('\n').map((line, i) => (
                     <span key={i}>
-                      <span dangerouslySetInnerHTML={{ 
-__html: line
-  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  .replace(/\*(.*?)\*/g, '<em>$1</em>')
-  .replace(/(https?:\/\/[^\s\)]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#E05C3A;text-decoration:underline;word-break:break-all;">$1</a>') }} />
+                      <span dangerouslySetInnerHTML={{ __html: line
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/(https?:\/\/[^\s\)]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#E05C3A;text-decoration:underline;word-break:break-all;">$1</a>')
+                      }} />
                       {i < msg.contenido.split('\n').length - 1 && <br />}
                     </span>
                   ))}
@@ -146,7 +144,7 @@ __html: line
                   )}
                 </div>
                 {msg.rol === 'user' && (
-                  <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 mt-0.5 shadow-sm" style={{ background: '#E8E8E8' }}>
+                  <div className="w-7 h-7 rounded-xl flex items-center justify-center shrink-0 mt-0.5 shadow-sm" style={{ background: 'var(--sand-dark)' }}>
                     <User className="w-3.5 h-3.5" style={{ color: 'var(--desert-blue)' }} />
                   </div>
                 )}
@@ -156,7 +154,7 @@ __html: line
             {isLoading && (
               <div className="flex gap-2 justify-start animate-fade-in">
                 <div className="shrink-0"><LogoIcon size={26} /></div>
-                <div className="bg-white border border-gray-100 shadow-sm rounded-2xl rounded-tl-sm px-4 py-3">
+                <div className="border shadow-sm rounded-2xl rounded-tl-sm px-4 py-3" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
                   <div className="flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
                     <Loader2 className="w-4 h-4 animate-spin" />
                     <span className="text-sm">Pensando...</span>
@@ -167,9 +165,9 @@ __html: line
             <div ref={bottomRef} />
           </div>
 
-          <div className="p-3 bg-white/80 backdrop-blur-sm border-t shrink-0" style={{ borderColor: 'var(--border)' }}>
+          <div className="shrink-0 p-3 border-t" style={{ borderColor: 'var(--border)', background: 'var(--surface)', paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}>
             <div className="flex gap-2 items-end max-w-2xl mx-auto">
-              <div className="flex-1 rounded-2xl flex items-end gap-2 px-4 py-3 bg-white border shadow-sm" style={{ borderColor: 'var(--border)' }}>
+              <div className="flex-1 rounded-2xl flex items-end gap-2 px-4 py-3 border shadow-sm" style={{ background: 'var(--sand)', borderColor: 'var(--border)' }}>
                 <textarea
                   ref={inputRef}
                   value={input}
