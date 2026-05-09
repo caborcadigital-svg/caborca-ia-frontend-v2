@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import MainLayout from '../MainLayout';
-import { negociosAPI } from '../lib/api';
+import { negociosAPI } from '../../lib/api';
 import { Store, MapPin, Phone, Clock, Search, MessageCircle, Menu, Plus, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
