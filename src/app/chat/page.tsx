@@ -131,7 +131,10 @@ export default function ChatPage() {
                 )} style={msg.rol === 'assistant' ? { color: 'var(--text-primary)' } : {}}>
                   {msg.contenido.split('\n').map((line, i) => (
                     <span key={i}>
-                      <span dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />
+                      <span dangerouslySetInnerHTML={{ __html: line
+  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+  .replace(/\*(.*?)\*/g, '<em>$1</em>')
+  .replace(/(https?:\/\/[^\s\)]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#E05C3A;text-decoration:underline;word-break:break-all;">$1</a>') }} />
                       {i < msg.contenido.split('\n').length - 1 && <br />}
                     </span>
                   ))}
