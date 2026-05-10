@@ -25,10 +25,11 @@ const ADMIN_NAV = [
   { href:'/admin/deportes', label:'Deportes', icon:Trophy },
   { href:'/admin/negocios', label:'Negocios', icon:Store },
   { href:'/admin/reportes', label:'Reportes', icon:AlertTriangle },
+  { href:'/admin/resultados', label:'Resultados enviados', icon:Trophy },
   { href:'/admin/solicitudes', label:'Solicitudes', icon:Store },
   { href:'/admin/publicidad', label:'Publicidad', icon:Megaphone },
   { href:'/admin/sugerencias', label:'Sugerencias Chat', icon:MessageSquare },
-  { href:'/admin/stats', label:'Estadísticas Chat', icon:BarChart2 },
+  { href:'/admin/stats', label:'Estadisticas Chat', icon:BarChart2 },
 ];
 
 function LogoIcon({ size = 36 }: { size?: number }) {
