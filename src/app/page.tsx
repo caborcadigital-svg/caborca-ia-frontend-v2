@@ -79,7 +79,7 @@ export default function HomePage() {
           <div className="rounded-2xl p-4 text-white flex items-center justify-between gap-3" style={getHeroBg()}>
             <div>
               <h1 className="font-display text-lg font-bold leading-tight">
-                {heroConfig.hero_titulo}<br/><span className="text-yellow-300">{heroConfig.hero_ciudad}</span>?
+                {heroConfig.hero_titulo}<br/><span className="text-yellow-300">{heroConfig.hero_ciudad}</span>
               </h1>
               <p className="text-white/60 text-xs mt-0.5">{heroConfig.hero_subtitulo}</p>
             </div>
@@ -100,8 +100,8 @@ export default function HomePage() {
           </div>
 
           {banner && (
-            <div className="rounded-2xl p-3 flex items-center justify-between gap-3 transition-all border"
-              style={{ background: (banner.color || '#E05C3A') + '12', borderColor: (banner.color || '#E05C3A') + '30' }}>
+            <div className="rounded-2xl p-3 flex items-center justify-between gap-3 transition-all"
+              style={{ background: '#ffffff', border: '1px solid #E0E0E0' }}>
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 {banner.imagen_url && <img src={banner.imagen_url} alt={banner.titulo} className="w-10 h-10 rounded-xl object-cover shrink-0" />}
                 <div className="min-w-0">
