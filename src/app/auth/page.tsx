@@ -12,7 +12,8 @@ export default function AuthPage() {
   const [form, setForm] = useState({ nombre:'', username:'', email:'', password:'', codigo_admin:'' });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setUser } = useAuthStore();
+  const { login } = useAuthStore();
+
   const router = useRouter();
 
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
@@ -23,18 +24,19 @@ export default function AuthPage() {
     try {
       let data;
       if (tab === 'login') {
-        data = await authAPI.login({ identificador: form.email, password: form.password });
-      } else {
-        if (!form.nombre || !form.username) { toast.error('Nombre y usuario requeridos'); setLoading(false); return; }
-        data = await authAPI.registro({ nombre: form.nombre, username: form.username, email: form.email, password: form.password, codigo_admin: form.codigo_admin });
-      }
-      if (data.token) {
-        localStorage.setItem('caborca_token', data.token);
-        localStorage.setItem('caborca_user', JSON.stringify(data.usuario));
-        setUser(data.usuario);
-        toast.success(tab === 'login' ? 'Bienvenido ' + data.usuario.nombre : 'Cuenta creada exitosamente');
-        router.push('/');
-      }
+  await login(form.email, form.password);
+  toast.success('Bienvenido');
+  router.push('/');
+} else {
+  if (!form.nombre || !form.username) { toast.error('Nombre y usuario requeridos'); setLoading(false); return; }
+  data = await authAPI.registro({ nombre: form.nombre, username: form.username, email: form.email, password: form.password, codigo_admin: form.codigo_admin });
+  if (data.token) {
+    localStorage.setItem('caborca_token', data.token);
+    localStorage.setItem('caborca_user', JSON.stringify(data.usuario));
+    toast.success('Cuenta creada exitosamente');
+    router.push('/');
+  }
+}
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Error al ' + (tab === 'login' ? 'iniciar sesion' : 'registrarse'));
     } finally { setLoading(false); }
