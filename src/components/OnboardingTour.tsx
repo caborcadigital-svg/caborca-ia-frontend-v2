@@ -171,9 +171,8 @@ export default function OnboardingTour() {
             )}
           </div>
 
-          <div style={{ ...getTooltipStyle(), position: 'fixed', zIndex: 10001 }}
-            className="rounded-2xl shadow-2xl p-4 animate-slide-up"
-            style={{ ...getTooltipStyle(), background: 'white', borderColor: '#E0E0E0', border: '1px solid #E0E0E0' }}>
+          <div style={{ ...getTooltipStyle(), position: 'fixed', zIndex: 10001, background: 'white', border: '1px solid #E0E0E0' }}
+  className="rounded-2xl shadow-2xl p-4 animate-slide-up">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold" style={{ color: '#E05C3A' }}>
                 {step + 1} / {STEPS.length}
