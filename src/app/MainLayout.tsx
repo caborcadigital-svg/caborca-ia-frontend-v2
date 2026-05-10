@@ -9,14 +9,14 @@ import GlobalSearch from '../components/GlobalSearch';
 import clsx from 'clsx';
 
 const NAV = [
-  { href:'/', label:'Inicio', icon:LayoutDashboard },
-  { href:'/chat', label:'Chat IA', icon:MessageSquare },
-  { href:'/clima', label:'Clima', icon:Cloud },
+  { href:'/', label:'Inicio', icon:LayoutDashboard, tour:'inicio' },
+  { href:'/chat', label:'Chat IA', icon:MessageSquare, tour:'chat' },
+  { href:'/clima', label:'Clima', icon:Cloud, tour:'clima' },
   { href:'/noticias', label:'Noticias', icon:Newspaper },
   { href:'/eventos', label:'Eventos', icon:CalendarDays },
-  { href:'/reportes', label:'Reportes', icon:AlertTriangle },
-  { href:'/deportes', label:'Deportes', icon:Trophy },
-  { href:'/negocios', label:'Negocios', icon:Store },
+  { href:'/reportes', label:'Reportes', icon:AlertTriangle, tour:'reportes' },
+  { href:'/deportes', label:'Deportes', icon:Trophy, tour:'deportes' },
+  { href:'/negocios', label:'Negocios', icon:Store, tour:'negocios' },
 ];
 
 const ADMIN_NAV = [
@@ -79,10 +79,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <button onClick={() => setOpen(false)} className="ml-auto lg:hidden text-white/50 hover:text-white"><X className="w-5 h-5" /></button>
         </div>
         <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-          {!enAdmin && NAV.map(({ href, label, icon:Icon }) => {
+          {!enAdmin && NAV.map(({ href, label, icon:Icon, tour }) => {
             const active = pathname === href || (href !== '/' && pathname.startsWith(href));
             return (
-              <Link key={href} href={href} onClick={() => setOpen(false)}
+              <Link key={href} href={href} onClick={() => setOpen(false)} data-tour={tour}
                 className={clsx('flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all', active ? 'nav-active' : 'text-white/60 hover:text-white hover:bg-white/10')}>
                 <Icon className="w-4 h-4 shrink-0" />{label}
                 {active && <ChevronRight className="w-3 h-3 ml-auto opacity-70" />}
@@ -133,7 +133,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
       </aside>
       <div className="flex-1 flex flex-col min-w-0 lg:pl-[260px]">
-        <header className="flex items-center gap-3 px-4 py-2.5 border-b sticky top-0 z-10 bg-white/90 backdrop-blur-sm lg:bg-white/70" style={{ borderColor:'var(--border)' }}>
+        <header className="flex items-center gap-3 px-4 py-2.5 border-b sticky top-0 z-10 bg-white/90 backdrop-blur-sm" style={{ borderColor:'var(--border)' }}>
           <button onClick={() => setOpen(true)} className="lg:hidden" style={{ color:'var(--desert-blue)' }}><Menu className="w-5 h-5" /></button>
           <div className="flex items-center gap-2 lg:hidden"><LogoIcon size={30} /><span className="font-display font-bold text-sm" style={{ color:'var(--desert-blue)' }}>{enAdmin ? 'Admin' : 'Caborca IA'}</span></div>
           <div className="flex-1 flex items-center justify-end gap-2">
