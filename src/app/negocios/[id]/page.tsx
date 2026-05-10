@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import MainLayout from '../../MainLayout';
-import api from '../../lib/api';
+import api from '../../../lib/api';
 import { ArrowLeft, Phone, MapPin, Clock, MessageCircle, Menu, Globe, Star } from 'lucide-react';
-import ShareWhatsApp from '../../components/ShareWhatsApp';
+import ShareWhatsApp from '../../../components/ShareWhatsApp';
 
 function formatWhatsApp(tel: string) {
   const digits = tel.replace(/\D/g, '');
