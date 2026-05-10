@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle, Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone, Moon, Sun, BarChart2, Settings } from 'lucide-react';
+import { MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle, Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone, Moon, Sun, BarChart2, Settings, Users } from 'lucide-react';
 import { useAuthStore } from '../hooks/useAuth';
 import { useDarkMode } from '../hooks/useDarkMode';
 import GlobalSearch from '../components/GlobalSearch';
@@ -19,19 +19,20 @@ const NAV = [
   { href:'/negocios', label:'Negocios', icon:Store, tour:'negocios' },
 ];
 
-const ADMIN_NAV = [
-  { href:'/admin', label:'Panel Admin', icon:LayoutDashboard },
-  { href:'/admin/noticias', label:'Noticias', icon:Newspaper },
-  { href:'/admin/eventos', label:'Eventos', icon:CalendarDays },
-  { href:'/admin/deportes', label:'Deportes', icon:Trophy },
-  { href:'/admin/negocios', label:'Negocios', icon:Store },
-  { href:'/admin/reportes', label:'Reportes', icon:AlertTriangle },
-  { href:'/admin/resultados', label:'Resultados enviados', icon:Trophy },
-  { href:'/admin/solicitudes', label:'Solicitudes', icon:Store },
-  { href:'/admin/publicidad', label:'Publicidad', icon:Megaphone },
-  { href:'/admin/sugerencias', label:'Sugerencias Chat', icon:MessageSquare },
-  { href:'/admin/stats', label:'Estadisticas Chat', icon:BarChart2 },
-  { href:'/admin/config', label:'Configuracion', icon:Settings },
+const ADMIN_NAV_BASE = [
+  { href:'/admin', label:'Panel Admin', icon:LayoutDashboard, roles:['superadmin','admin','editor_noticias','editor_eventos','moderador'] },
+  { href:'/admin/noticias', label:'Noticias', icon:Newspaper, roles:['superadmin','admin','editor_noticias'] },
+  { href:'/admin/eventos', label:'Eventos', icon:CalendarDays, roles:['superadmin','admin','editor_eventos'] },
+  { href:'/admin/deportes', label:'Deportes', icon:Trophy, roles:['superadmin','admin'] },
+  { href:'/admin/negocios', label:'Negocios', icon:Store, roles:['superadmin','admin'] },
+  { href:'/admin/reportes', label:'Reportes', icon:AlertTriangle, roles:['superadmin','admin','moderador'] },
+  { href:'/admin/resultados', label:'Resultados enviados', icon:Trophy, roles:['superadmin','admin','moderador'] },
+  { href:'/admin/solicitudes', label:'Solicitudes', icon:Store, roles:['superadmin','admin'] },
+  { href:'/admin/publicidad', label:'Publicidad', icon:Megaphone, roles:['superadmin','admin'] },
+  { href:'/admin/sugerencias', label:'Sugerencias Chat', icon:MessageSquare, roles:['superadmin','admin'] },
+  { href:'/admin/stats', label:'Estadisticas Chat', icon:BarChart2, roles:['superadmin','admin'] },
+  { href:'/admin/usuarios', label:'Colaboradores', icon:Users, roles:['superadmin'] },
+  { href:'/admin/config', label:'Configuracion', icon:Settings, roles:['superadmin'] },
 ];
 
 function LogoIcon({ size = 36 }: { size?: number }) {
@@ -66,8 +67,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const { user, isAuthenticated, logout, loadFromStorage } = useAuthStore();
   const { dark, toggle } = useDarkMode();
   useEffect(() => { loadFromStorage(); }, []);
-  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+
+  const rol = user?.role || '';
+  const isAdmin = ['superadmin','admin','editor_noticias','editor_eventos','moderador'].includes(rol);
+  const isSuperadmin = rol === 'superadmin';
   const enAdmin = pathname.startsWith('/admin');
+
+  const adminNav = ADMIN_NAV_BASE.filter(item => item.roles.includes(rol));
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background:'var(--sand)' }}>
@@ -100,8 +106,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           {isAdmin && enAdmin && (
             <>
               <div className="px-3 mb-2"><Link href="/" onClick={() => setOpen(false)} className="text-xs text-white/40 hover:text-white/70 flex items-center gap-1">← Volver al sitio</Link></div>
-              <p className="text-xs text-white/30 px-3 mb-1 font-medium uppercase tracking-wider">Admin</p>
-              {ADMIN_NAV.map(({ href, label, icon:Icon }) => {
+              <div className="px-3 mb-1 flex items-center gap-2">
+                <p className="text-xs text-white/30 font-medium uppercase tracking-wider">Admin</p>
+                {isSuperadmin && <span className="text-xs px-1.5 py-0.5 rounded-full text-white/70 border border-white/20" style={{ fontSize:'9px' }}>SUPER</span>}
+              </div>
+              {adminNav.map(({ href, label, icon:Icon }) => {
                 const active = pathname === href || (href !== '/admin' && pathname.startsWith(href));
                 return (
                   <Link key={href} href={href} onClick={() => setOpen(false)}
@@ -122,7 +131,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           {isAuthenticated ? (
             <div className="flex items-center gap-3 px-3 py-2">
               <div className="w-8 h-8 rounded-full gradient-sunset flex items-center justify-center text-white text-sm font-bold shrink-0">{user?.nombre?.[0]?.toUpperCase()}</div>
-              <div className="flex-1 min-w-0"><div className="text-sm font-medium text-white truncate">{user?.nombre}</div><div className="text-xs text-white/40 truncate">@{user?.username}</div></div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-white truncate">{user?.nombre}</div>
+                <div className="text-xs text-white/40 truncate capitalize">{user?.role}</div>
+              </div>
               <button onClick={logout} className="text-white/40 hover:text-red-400 transition-colors"><LogOut className="w-4 h-4" /></button>
             </div>
           ) : (
