@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import MainLayout from '../../../MainLayout';
-import api from '../../../lib/api';
+import MainLayout from '../../MainLayout';
+import api from '../../lib/api';
 import { ArrowLeft, Phone, MapPin, Clock, MessageCircle, Menu, Globe, Star } from 'lucide-react';
 
 function formatWhatsApp(tel: string) {
