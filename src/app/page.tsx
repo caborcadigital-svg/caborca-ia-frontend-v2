@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Cloud, Newspaper, CalendarDays, AlertTriangle, Trophy, Store, MessageSquare, Star, ChevronRight } from 'lucide-react';
@@ -10,14 +9,25 @@ import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 const ACCESOS = [
-  { href: '/chat', label: 'Chat IA', icon: MessageSquare, color: '#E05C3A', bg: '#FEF0EC' },
-  { href: '/clima', label: 'Clima', icon: Cloud, color: '#4A90C4', bg: '#EFF6FC' },
-  { href: '/noticias', label: 'Noticias', icon: Newspaper, color: '#6B3FA0', bg: '#F3EEF9' },
-  { href: '/eventos', label: 'Eventos', icon: CalendarDays, color: '#4A7C59', bg: '#EEF5F0' },
-  { href: '/reportes', label: 'Reportes', icon: AlertTriangle, color: '#C4622D', bg: '#FDF1EC' },
-  { href: '/deportes', label: 'Deportes', icon: Trophy, color: '#E8823A', bg: '#FEF0E8' },
-  { href: '/negocios', label: 'Negocios', icon: Store, color: '#2D5F8A', bg: '#EEF4F9' },
+  { href:'/chat', label:'Chat IA', icon:MessageSquare, color:'#E05C3A', bg:'#FEF0EC' },
+  { href:'/clima', label:'Clima', icon:Cloud, color:'#4A90C4', bg:'#EFF6FC' },
+  { href:'/noticias', label:'Noticias', icon:Newspaper, color:'#6B3FA0', bg:'#F3EEF9' },
+  { href:'/eventos', label:'Eventos', icon:CalendarDays, color:'#4A7C59', bg:'#EEF5F0' },
+  { href:'/reportes', label:'Reportes', icon:AlertTriangle, color:'#C4622D', bg:'#FDF1EC' },
+  { href:'/deportes', label:'Deportes', icon:Trophy, color:'#E8823A', bg:'#FEF0E8' },
+  { href:'/negocios', label:'Negocios', icon:Store, color:'#2D5F8A', bg:'#EEF4F9' },
 ];
+
+const DEFAULT_CONFIG = {
+  hero_titulo: '¿Qué pasa hoy en',
+  hero_ciudad: 'Caborca',
+  hero_subtitulo: 'Heroica Caborca, Sonora',
+  hero_bg_type: 'gradient',
+  hero_gradient: 'linear-gradient(135deg, #1E3A5F 0%, #6B3FA0 60%, #E05C3A 100%)',
+  hero_imagen: '',
+  hero_color1: '#1E3A5F',
+  hero_color2: '#E05C3A',
+};
 
 export default function HomePage() {
   const [clima, setClima] = useState<any>(null);
@@ -27,6 +37,17 @@ export default function HomePage() {
   const [negociosDestacados, setNegociosDestacados] = useState<any[]>([]);
   const [banners, setBanners] = useState<any[]>([]);
   const [bannerIdx, setBannerIdx] = useState(0);
+  const [heroConfig, setHeroConfig] = useState(DEFAULT_CONFIG);
+
+  const getHeroBg = () => {
+    if (heroConfig.hero_bg_type === 'imagen' && heroConfig.hero_imagen) {
+      return { backgroundImage: 'url(' + heroConfig.hero_imagen + ')', backgroundSize: 'cover', backgroundPosition: 'center' };
+    }
+    if (heroConfig.hero_gradient === 'custom') {
+      return { background: 'linear-gradient(135deg, ' + heroConfig.hero_color1 + ', ' + heroConfig.hero_color2 + ')' };
+    }
+    return { background: heroConfig.hero_gradient };
+  };
 
   const cargarDatos = useCallback(async () => {
     await Promise.allSettled([
@@ -35,10 +56,8 @@ export default function HomePage() {
       eventosAPI.getAll({ proximos: true }).then(d => setEventos(d.slice(0, 2))),
       deportesAPI.getPartidos().then(d => setPartidos(d.slice(0, 2))),
       negociosAPI.getAll().then(d => setNegociosDestacados(d.filter((n: any) => n.destacado).slice(0, 4))),
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/publicidad`)
-        .then(r => r.json())
-        .then(d => setBanners(Array.isArray(d) ? d.filter((b: any) => b.activo) : []))
-        .catch(() => {}),
+      fetch(process.env.NEXT_PUBLIC_API_URL + '/publicidad').then(r => r.json()).then(d => setBanners(Array.isArray(d) ? d.filter((b: any) => b.activo) : [])).catch(() => {}),
+      fetch(process.env.NEXT_PUBLIC_API_URL + '/config').then(r => r.json()).then(d => { if (d && Object.keys(d).length) setHeroConfig(c => ({ ...c, ...d })); }).catch(() => {}),
     ]);
   }, []);
 
@@ -57,15 +76,16 @@ export default function HomePage() {
       <PullToRefresh onRefresh={cargarDatos}>
         <div className="px-3 py-3 space-y-3 max-w-2xl mx-auto lg:max-w-5xl pb-24 lg:pb-6">
 
-          {/* Hero */}
-          <div className="rounded-2xl gradient-desert-hero p-4 text-white flex items-center justify-between gap-3">
+          <div className="rounded-2xl p-4 text-white flex items-center justify-between gap-3" style={getHeroBg()}>
             <div>
-              <h1 className="font-display text-lg font-bold leading-tight">¿Qué pasa hoy en<br/><span className="text-yellow-300">Caborca</span>?</h1>
-              <p className="text-white/60 text-xs mt-0.5">Heroica Caborca, Sonora</p>
+              <h1 className="font-display text-lg font-bold leading-tight">
+                {heroConfig.hero_titulo}<br/><span className="text-yellow-300">{heroConfig.hero_ciudad}</span>?
+              </h1>
+              <p className="text-white/60 text-xs mt-0.5">{heroConfig.hero_subtitulo}</p>
             </div>
             {clima ? (
               <div className="flex items-center gap-2 bg-white/15 rounded-xl px-3 py-2 shrink-0">
-                <img src={`https://openweathermap.org/img/wn/${clima.icono}.png`} alt="" className="w-8 h-8" />
+                <img src={'https://openweathermap.org/img/wn/' + clima.icono + '.png'} alt="" className="w-8 h-8" />
                 <div>
                   <div className="text-2xl font-display font-bold leading-none">{clima.temperatura}°</div>
                   <div className="text-xs text-white/60 capitalize">{clima.descripcion}</div>
@@ -79,14 +99,11 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Banner publicitario desde Supabase */}
           {banner && (
             <div className="rounded-2xl p-3 flex items-center justify-between gap-3 transition-all border"
               style={{ background: (banner.color || '#E05C3A') + '12', borderColor: (banner.color || '#E05C3A') + '30' }}>
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                {banner.imagen_url && (
-                  <img src={banner.imagen_url} alt={banner.titulo} className="w-10 h-10 rounded-xl object-cover shrink-0" />
-                )}
+                {banner.imagen_url && <img src={banner.imagen_url} alt={banner.titulo} className="w-10 h-10 rounded-xl object-cover shrink-0" />}
                 <div className="min-w-0">
                   <div className="text-xs font-bold truncate" style={{ color: banner.color || '#E05C3A' }}>{banner.titulo}</div>
                   {banner.subtitulo && <div className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-secondary)' }}>{banner.subtitulo}</div>}
@@ -100,15 +117,12 @@ export default function HomePage() {
                 ))}
                 {banner.link_url && (
                   <a href={banner.link_url} target="_blank" rel="noopener noreferrer"
-                    className="text-xs font-medium ml-1" style={{ color: banner.color || '#E05C3A' }}>
-                    Ver →
-                  </a>
+                    className="text-xs font-medium ml-1" style={{ color: banner.color || '#E05C3A' }}>Ver →</a>
                 )}
               </div>
             </div>
           )}
 
-          {/* Accesos rápidos */}
           <div className="grid grid-cols-4 lg:grid-cols-7 gap-2">
             {ACCESOS.map(({ href, label, icon: Icon, color, bg }) => (
               <Link key={href} href={href}
@@ -122,23 +136,19 @@ export default function HomePage() {
           </div>
 
           <div className="grid lg:grid-cols-3 gap-3">
-            {/* Noticias */}
             <div className="lg:col-span-2 space-y-2">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-bold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
-                  <Newspaper className="w-4 h-4" style={{ color: '#6B3FA0' }} />
-                  Noticias
+                  <Newspaper className="w-4 h-4" style={{ color: '#6B3FA0' }} /> Noticias
                 </h2>
                 <Link href="/noticias" className="text-xs font-medium flex items-center gap-0.5" style={{ color: 'var(--terracotta)' }}>
                   Ver más <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
               {noticias.length === 0 ? (
-                <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm text-center text-xs" style={{ color: 'var(--text-muted)' }}>
-                  Sin noticias por el momento
-                </div>
+                <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm text-center text-xs" style={{ color: 'var(--text-muted)' }}>Sin noticias por el momento</div>
               ) : noticias.map(n => (
-                <Link key={n.id} href={`/noticias/${n.id}`}
+                <Link key={n.id} href={'/noticias/' + n.id}
                   className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm flex gap-3 hover:shadow-md transition-all group block">
                   {n.imagen_url && <img src={n.imagen_url} alt={n.titulo} className="w-14 h-14 rounded-lg object-cover shrink-0" />}
                   <div className="min-w-0 flex-1">
@@ -152,14 +162,12 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* Sidebar */}
             <div className="space-y-3">
               {eventos.length > 0 && (
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <h2 className="text-sm font-bold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
-                      <CalendarDays className="w-4 h-4" style={{ color: '#4A7C59' }} />
-                      Eventos
+                      <CalendarDays className="w-4 h-4" style={{ color: '#4A7C59' }} /> Eventos
                     </h2>
                     <Link href="/eventos" className="text-xs font-medium" style={{ color: 'var(--terracotta)' }}>Ver →</Link>
                   </div>
@@ -168,21 +176,19 @@ export default function HomePage() {
                       <div key={e.id} className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm">
                         <div className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{e.nombre}</div>
                         <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                          {new Date(e.fecha_inicio).toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' })}
-                          {e.lugar && ` · ${e.lugar}`}
+                          {new Date(e.fecha_inicio).toLocaleDateString('es-MX', { weekday:'short', day:'numeric', month:'short' })}
+                          {e.lugar && ' · ' + e.lugar}
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-
               {partidos.length > 0 && (
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <h2 className="text-sm font-bold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
-                      <Trophy className="w-4 h-4" style={{ color: '#E8823A' }} />
-                      Deportes
+                      <Trophy className="w-4 h-4" style={{ color: '#E8823A' }} /> Deportes
                     </h2>
                     <Link href="/deportes" className="text-xs font-medium" style={{ color: 'var(--terracotta)' }}>Ver →</Link>
                   </div>
@@ -205,13 +211,11 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Negocios destacados */}
           {negociosDestacados.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-sm font-bold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
-                  <Star className="w-4 h-4" style={{ color: '#E8823A' }} />
-                  Negocios destacados
+                  <Star className="w-4 h-4" style={{ color: '#E8823A' }} /> Negocios destacados
                 </h2>
                 <Link href="/negocios" className="text-xs font-medium flex items-center gap-0.5" style={{ color: 'var(--terracotta)' }}>
                   Ver todos <ChevronRight className="w-3 h-3" />
@@ -219,7 +223,7 @@ export default function HomePage() {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {negociosDestacados.map(n => (
-                  <Link key={n.id} href={`/negocios/${n.id}`}
+                  <Link key={n.id} href={'/negocios/' + n.id}
                     className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all block">
                     {n.imagen_url ? (
                       <img src={n.imagen_url} alt={n.nombre} className="w-full h-20 object-cover" />
@@ -229,9 +233,6 @@ export default function HomePage() {
                     <div className="p-2.5">
                       <div className="text-xs font-bold line-clamp-1" style={{ color: 'var(--text-primary)' }}>{n.nombre}</div>
                       <div className="text-xs capitalize mt-0.5" style={{ color: 'var(--text-muted)' }}>{n.categoria}</div>
-                      {n.telefono && (
-                        <div className="text-xs mt-1 font-medium" style={{ color: 'var(--terracotta)' }}>📞 {n.telefono}</div>
-                      )}
                     </div>
                   </Link>
                 ))}
@@ -239,15 +240,14 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* CTA Chat */}
           <Link href="/chat"
             className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition-all group block">
             <div className="w-10 h-10 rounded-xl gradient-sunset flex items-center justify-center shadow-md shrink-0">
               <MessageSquare className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Pregúntale a Caborca IA</div>
-              <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Clima, negocios, eventos y más...</div>
+              <div className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Preguntale a Caborca IA</div>
+              <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Clima, negocios, eventos y mas...</div>
             </div>
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" style={{ color: 'var(--terracotta)' }} />
           </Link>
