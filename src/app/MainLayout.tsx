@@ -17,6 +17,8 @@ const NAV = [
   { href:'/reportes', label:'Reportes', icon:AlertTriangle, tour:'reportes' },
   { href:'/deportes', label:'Deportes', icon:Trophy, tour:'deportes' },
   { href:'/negocios', label:'Negocios', icon:Store, tour:'negocios' },
+{ href:'/emergencias', label:'Emergencias', icon:AlertCircle },
+
 ];
 
 const ADMIN_NAV_BASE = [
@@ -33,6 +35,8 @@ const ADMIN_NAV_BASE = [
   { href:'/admin/stats', label:'Estadisticas Chat', icon:BarChart2, roles:['superadmin','admin'] },
   { href:'/admin/usuarios', label:'Colaboradores', icon:Users, roles:['superadmin'] },
   { href:'/admin/config', label:'Configuracion', icon:Settings, roles:['superadmin'] },
+{ href:'/admin/emergencias', label:'Emergencias', icon:AlertCircle, roles:['superadmin','admin'] },
+
 ];
 
 function LogoIcon({ size = 36 }: { size?: number }) {
