@@ -30,13 +30,13 @@
   --sand-dark: #1A1D27;
   --text-primary: #F0F2F5;
   --text-secondary: #A0A8C0;
-  --text-muted: #5A6080;
+  --text-muted: #6A7090;
   --border: #2A2D3E;
   --surface: #1A1D27;
+  --desert-blue: #7BAFD4;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { scroll-behavior: smooth; }
 
 body {
@@ -48,38 +48,22 @@ body {
 }
 
 .font-display { font-family: var(--font-display); }
-
-.gradient-sunset {
-  background: linear-gradient(135deg, #E05C3A, #E8823A);
-}
-
-.gradient-desert-hero {
-  background: linear-gradient(135deg, #1E3A5F 0%, #6B3FA0 60%, #E05C3A 100%);
-}
-
-.sidebar-desert {
-  background: linear-gradient(180deg, #1E3A5F 0%, #162D4A 100%);
-}
-
-.nav-active {
-  background: rgba(255,255,255,0.15);
-  color: white;
-}
+.gradient-sunset { background: linear-gradient(135deg, #E05C3A, #E8823A); }
+.gradient-desert-hero { background: linear-gradient(135deg, #1E3A5F 0%, #6B3FA0 60%, #E05C3A 100%); }
+.sidebar-desert { background: linear-gradient(180deg, #1E3A5F 0%, #162D4A 100%); }
+.nav-active { background: rgba(255,255,255,0.15); color: white; }
 
 .dark .bg-white { background: var(--surface) !important; }
 .dark .border-gray-100 { border-color: var(--border) !important; }
 .dark .bg-gray-100 { background: var(--sand-dark) !important; }
-.dark .text-gray-100 { color: var(--text-muted) !important; }
 
 @keyframes slide-up {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 .animate-slide-up { animation: slide-up 0.2s ease-out; }
 .animate-fade-in { animation: fade-in 0.3s ease-out; }

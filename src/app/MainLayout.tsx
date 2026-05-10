@@ -2,9 +2,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle, Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone, Moon, Sun, BarChart2 } from 'lucide-react';
+import { MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle, Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone, Moon, Sun, BarChart2, Settings } from 'lucide-react';
 import { useAuthStore } from '../hooks/useAuth';
 import { useDarkMode } from '../hooks/useDarkMode';
+import GlobalSearch from '../components/GlobalSearch';
 import clsx from 'clsx';
 
 const NAV = [
@@ -30,6 +31,7 @@ const ADMIN_NAV = [
   { href:'/admin/publicidad', label:'Publicidad', icon:Megaphone },
   { href:'/admin/sugerencias', label:'Sugerencias Chat', icon:MessageSquare },
   { href:'/admin/stats', label:'Estadisticas Chat', icon:BarChart2 },
+  { href:'/admin/config', label:'Configuracion', icon:Settings },
 ];
 
 function LogoIcon({ size = 36 }: { size?: number }) {
@@ -124,17 +126,23 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               <button onClick={logout} className="text-white/40 hover:text-red-400 transition-colors"><LogOut className="w-4 h-4" /></button>
             </div>
           ) : (
-            <Link href="/chat" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl gradient-sunset text-white text-sm font-medium w-full shadow-lg">
-              <MessageSquare className="w-4 h-4" />Iniciar chat
+            <Link href="/auth" onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl gradient-sunset text-white text-sm font-medium w-full shadow-lg">
+              <MessageSquare className="w-4 h-4" />Iniciar sesion
             </Link>
           )}
         </div>
       </aside>
       <div className="flex-1 flex flex-col min-w-0 lg:pl-[260px]">
-        <header className="flex items-center gap-3 px-4 py-2.5 lg:hidden border-b sticky top-0 z-10 bg-white/90 backdrop-blur-sm" style={{ borderColor:'var(--border)' }}>
-          <button onClick={() => setOpen(true)} style={{ color:'var(--desert-blue)' }}><Menu className="w-5 h-5" /></button>
-          <div className="flex items-center gap-2"><LogoIcon size={30} /><span className="font-display font-bold text-sm" style={{ color:'var(--desert-blue)' }}>{enAdmin ? 'Admin' : 'Caborca IA'}</span></div>
-          <button onClick={toggle} className="ml-auto p-1.5 rounded-lg" style={{ color:'var(--text-muted)' }}>{dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}</button>
+        <header className="flex items-center gap-3 px-4 py-2.5 border-b sticky top-0 z-10 bg-white/90 backdrop-blur-sm lg:bg-white/70" style={{ borderColor:'var(--border)' }}>
+          <button onClick={() => setOpen(true)} className="lg:hidden" style={{ color:'var(--desert-blue)' }}><Menu className="w-5 h-5" /></button>
+          <div className="flex items-center gap-2 lg:hidden"><LogoIcon size={30} /><span className="font-display font-bold text-sm" style={{ color:'var(--desert-blue)' }}>{enAdmin ? 'Admin' : 'Caborca IA'}</span></div>
+          <div className="flex-1 flex items-center justify-end gap-2">
+            {!enAdmin && <GlobalSearch />}
+            <button onClick={toggle} className="p-1.5 rounded-lg" style={{ color:'var(--text-muted)' }}>{dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}</button>
+            {!isAuthenticated && !enAdmin && (
+              <Link href="/auth" className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium gradient-sunset text-white">Iniciar sesion</Link>
+            )}
+          </div>
         </header>
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
