@@ -9,6 +9,12 @@ const TIPOS = ['ambulancia','hospital','policia','bomberos','cruz_roja','protecc
 const CATEGORIAS = ['emergencia','salud','seguridad','servicios','gobierno'];
 const FORM_INIT = { nombre:'', tipo:'hospital', categoria:'salud', telefono:'', telefono2:'', descripcion:'', direccion:'', activo:true };
 
+const ICONOS: Record<string, string> = {
+  ambulancia:'🚑', hospital:'🏥', policia:'👮', bomberos:'🚒',
+  cruz_roja:'🩺', proteccion_civil:'🦺', imss:'🏨', issste:'🏨',
+  gas:'⚠️', luz:'⚡', agua:'💧', vialidad:'🚦', dif:'🤝', otro:'📞',
+};
+
 export default function AdminEmergenciasPage() {
   const [items, setItems] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -25,7 +31,7 @@ export default function AdminEmergenciasPage() {
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
 
   const handleSave = async () => {
-    if (!form.nombre || !form.telefono) { toast.error('Nombre y teléfono requeridos'); return; }
+    if (!form.nombre || !form.telefono) { toast.error('Nombre y telefono requeridos'); return; }
     setIsSaving(true);
     try {
       if (editId) {
@@ -61,8 +67,6 @@ export default function AdminEmergenciasPage() {
     } catch { toast.error('Error actualizando'); }
   };
 
-  const inp = "input-field";
-
   return (
     <MainLayout>
       <div className="max-w-3xl mx-auto px-3 py-4 space-y-4 pb-24">
@@ -86,55 +90,48 @@ export default function AdminEmergenciasPage() {
         {showForm && (
           <div className="rounded-2xl p-5 border shadow-sm space-y-4 animate-slide-up" style={{ background:'var(--card)', borderColor:'var(--border)' }}>
             <h3 className="font-semibold text-sm" style={{ color:'var(--text-primary)' }}>{editId ? 'Editar servicio' : 'Nuevo servicio de emergencias'}</h3>
-
             <div>
               <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Nombre del servicio *</label>
-              <input type="text" placeholder="Cruz Roja Caborca" value={form.nombre} onChange={e => set('nombre', e.target.value)} className={inp} />
+              <input type="text" placeholder="Cruz Roja Caborca" value={form.nombre} onChange={e => set('nombre', e.target.value)} className="input-field" />
             </div>
-
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Tipo</label>
-                <select value={form.tipo} onChange={e => set('tipo', e.target.value)} className={inp}>
+                <select value={form.tipo} onChange={e => set('tipo', e.target.value)} className="input-field">
                   {TIPOS.map(t => <option key={t} value={t}>{t.replace('_', ' ')}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Categoría</label>
-                <select value={form.categoria} onChange={e => set('categoria', e.target.value)} className={inp}>
+                <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Categoria</label>
+                <select value={form.categoria} onChange={e => set('categoria', e.target.value)} className="input-field">
                   {CATEGORIAS.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Teléfono principal *</label>
-                <input type="tel" placeholder="6376370000" value={form.telefono} onChange={e => set('telefono', e.target.value)} className={inp} />
+                <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Telefono principal *</label>
+                <input type="tel" placeholder="6376370000" value={form.telefono} onChange={e => set('telefono', e.target.value)} className="input-field" />
               </div>
               <div>
-                <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Teléfono 2 (opcional)</label>
-                <input type="tel" placeholder="6376370001" value={form.telefono2} onChange={e => set('telefono2', e.target.value)} className={inp} />
+                <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Telefono 2 (opcional)</label>
+                <input type="tel" placeholder="6376370001" value={form.telefono2} onChange={e => set('telefono2', e.target.value)} className="input-field" />
               </div>
             </div>
-
             <div>
-              <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Dirección (opcional)</label>
-              <input type="text" placeholder="Blvd. Luis Donaldo Colosio..." value={form.direccion} onChange={e => set('direccion', e.target.value)} className={inp} />
+              <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Direccion (opcional)</label>
+              <input type="text" placeholder="Blvd. Luis Donaldo Colosio..." value={form.direccion} onChange={e => set('direccion', e.target.value)} className="input-field" />
             </div>
-
             <div>
-              <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Descripción (opcional)</label>
-              <input type="text" placeholder="Urgencias 24 horas" value={form.descripcion} onChange={e => set('descripcion', e.target.value)} className={inp} />
+              <label className="text-xs mb-1 block font-medium" style={{ color:'var(--text-secondary)' }}>Descripcion (opcional)</label>
+              <input type="text" placeholder="Urgencias 24 horas" value={form.descripcion} onChange={e => set('descripcion', e.target.value)} className="input-field" />
             </div>
-
             <div className="flex items-center gap-3">
               <button onClick={() => set('activo', !form.activo)} className="flex items-center gap-2 text-sm font-medium" style={{ color: form.activo ? '#16A34A' : 'var(--text-muted)' }}>
                 {form.activo ? <ToggleRight className="w-6 h-6" /> : <ToggleLeft className="w-6 h-6" />}
-                {form.activo ? 'Visible al público' : 'Oculto'}
+                {form.activo ? 'Visible al publico' : 'Oculto'}
               </button>
             </div>
-
             <button onClick={handleSave} disabled={isSaving}
               className="w-full py-3 rounded-xl gradient-sunset text-white font-medium text-sm disabled:opacity-50 shadow-sm">
               {isSaving ? 'Guardando...' : editId ? 'Actualizar' : 'Crear servicio'}
@@ -150,7 +147,7 @@ export default function AdminEmergenciasPage() {
           ) : items.map(item => (
             <div key={item.id} className={'rounded-2xl p-4 flex items-center gap-3 shadow-sm ' + (!item.activo ? 'opacity-50' : '')}
               style={{ background:'var(--card)', border:'1px solid var(--border)' }}>
-              <div className="text-2xl shrink-0">{{'ambulancia':'🚑','hospital':'🏥','policia':'👮','bomberos':'🚒','cruz_roja':'🩺','proteccion_civil':'🦺','imss':'🏨','issste':'🏨','gas':'⚠️','luz':'⚡','agua':'💧','vialidad':'🚦','dif':'🤝','otro':'📞'}[item.tipo] || '📞'}</div>
+              <div className="text-2xl shrink-0">{ICONOS[item.tipo] || '📞'}</div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-sm" style={{ color:'var(--text-primary)' }}>{item.nombre}</div>
                 <div className="text-xs mt-0.5 capitalize" style={{ color:'var(--text-muted)' }}>{item.categoria} · {item.telefono}{item.telefono2 ? ' / ' + item.telefono2 : ''}</div>
@@ -158,8 +155,7 @@ export default function AdminEmergenciasPage() {
               </div>
               <div className="flex gap-1.5 shrink-0">
                 <button onClick={() => toggleActivo(item)} className="w-8 h-8 rounded-xl flex items-center justify-center border transition-all"
-                  style={{ borderColor:'var(--border)', color: item.activo ? '#16A34A' : 'var(--text-muted)', background:'var(--card)' }}
-                  title={item.activo ? 'Desactivar' : 'Activar'}>
+                  style={{ borderColor:'var(--border)', color: item.activo ? '#16A34A' : 'var(--text-muted)', background:'var(--card)' }}>
                   {item.activo ? <ToggleRight className="w-4 h-4" /> : <ToggleLeft className="w-4 h-4" />}
                 </button>
                 <button onClick={() => handleEdit(item)} className="w-8 h-8 rounded-xl flex items-center justify-center border transition-all hover:bg-blue-50 hover:border-blue-200"
