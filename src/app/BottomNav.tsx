@@ -17,8 +17,13 @@ export default function BottomNav() {
   if (pathname.startsWith('/admin') || pathname.startsWith('/auth')) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
-      style={{ background: 'var(--surface)', borderTop: '0.5px solid var(--border)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <nav className="fixed bottom-0 left-0 right-0 lg:hidden"
+      style={{
+        background: 'var(--surface)',
+        borderTop: '0.5px solid var(--border)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        zIndex: 40,
+      }}>
       <div className="flex items-center justify-around px-2 py-1">
         {NAV.map(({ href, label, icon: Icon, fab, tour }) => {
           const active = pathname === href || (href !== '/' && pathname.startsWith(href));
