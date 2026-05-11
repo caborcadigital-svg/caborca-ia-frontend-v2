@@ -18,6 +18,8 @@ const NAV = [
   { href:'/deportes', label:'Deportes', icon:Trophy, tour:'deportes' },
   { href:'/negocios', label:'Negocios', icon:Store, tour:'negocios' },
   { href:'/emergencias', label:'Emergencias', icon:AlertCircle },
+{ href:'/sugerir-noticia', label:'Sugerir noticia', icon:Newspaper },
+
 ];
 
 const ADMIN_NAV_BASE = [
