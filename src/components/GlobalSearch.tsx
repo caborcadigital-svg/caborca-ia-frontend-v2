@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, Newspaper, CalendarDays, Store } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import VoiceSearch from './VoiceSearch';
 
 export default function GlobalSearch() {
   const [open, setOpen] = useState(false);
@@ -43,7 +42,7 @@ export default function GlobalSearch() {
           <Search className="w-4 h-4" />
           <span className="hidden sm:block">Buscar...</span>
         </button>
-        <VoiceSearch />
+      
       </div>
 
       {open && (
