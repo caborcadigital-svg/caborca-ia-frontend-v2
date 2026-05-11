@@ -1,149 +1,130 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import MainLayout from '../MainLayout';
-import { reportesAPI } from '../../lib/api';
-import { AlertTriangle, Plus, X, MapPin, Clock, Map, List } from 'lucide-react';
-import ShareWhatsApp from '../../components/ShareWhatsApp';
+import { useDarkMode } from '../../hooks/useDarkMode';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import toast from 'react-hot-toast';
 
-const TIPOS = ['accidente','apagón','tráfico','retén','seguridad','otro'];
-const TIPO_COLORS: Record<string,string> = { accidente:'#DC2626','apagón':'#D97706','tráfico':'#EA580C','retén':'#2563EB',seguridad:'#DC2626',otro:'#6B7280' };
-const CABORCA_CENTER: [number,number] = [30.7162,-112.1544];
+const TIPOS = ['accidente','tráfico','apagón','retén','seguridad','otro'];
+const TIPO_EMOJIS: Record<string,string> = { accidente:'🚗',tráfico:'🚦','apagón':'⚡',retén:'🚔',seguridad:'🚨',otro:'📋' };
+
+const TIPO_COLORS_LIGHT: Record<string,{bg:string,border:string,color:string}> = {
+  accidente:{bg:'#FEF2F2',border:'#FECACA',color:'#DC2626'},
+  tráfico:{bg:'#FFF7ED',border:'#FED7AA',color:'#EA580C'},
+  'apagón':{bg:'#FFFBEB',border:'#FDE68A',color:'#D97706'},
+  retén:{bg:'#EFF6FF',border:'#BFDBFE',color:'#2563EB'},
+  seguridad:{bg:'#FEF2F2',border:'#FECACA',color:'#DC2626'},
+  otro:{bg:'#F9FAFB',border:'#E5E7EB',color:'#6B7280'},
+};
+
+const TIPO_COLORS_DARK: Record<string,{bg:string,border:string,color:string}> = {
+  accidente:{bg:'rgba(220,38,38,0.08)',border:'rgba(220,38,38,0.2)',color:'#F87171'},
+  tráfico:{bg:'rgba(234,88,12,0.08)',border:'rgba(234,88,12,0.2)',color:'#FB923C'},
+  'apagón':{bg:'rgba(217,119,6,0.08)',border:'rgba(217,119,6,0.2)',color:'#FBBF24'},
+  retén:{bg:'rgba(37,99,235,0.08)',border:'rgba(37,99,235,0.2)',color:'#60A5FA'},
+  seguridad:{bg:'rgba(220,38,38,0.08)',border:'rgba(220,38,38,0.2)',color:'#F87171'},
+  otro:{bg:'rgba(107,114,128,0.08)',border:'rgba(107,114,128,0.2)',color:'#9CA3AF'},
+};
 
 export default function ReportesPage() {
   const [reportes, setReportes] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [vista, setVista] = useState<'lista'|'mapa'>('lista');
-  const [form, setForm] = useState({ tipo:'tráfico', descripcion:'', ubicacion:'' });
+  const [form, setForm] = useState({ tipo:'accidente', descripcion:'', ubicacion:'', email_contacto:'' });
   const [enviando, setEnviando] = useState(false);
-  const mapRef = useRef<any>(null);
-  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { dark } = useDarkMode();
 
-  useEffect(() => { reportesAPI.getAll().then(setReportes); }, []);
+  const TC = dark ? TIPO_COLORS_DARK : TIPO_COLORS_LIGHT;
+  const card = dark?'rgba(255,255,255,0.03)':'var(--card)';
+  const border = dark?'rgba(255,255,255,0.08)':'var(--border)';
+  const textP = dark?'rgba(255,255,255,0.85)':'var(--text-primary)';
+  const textM = dark?'rgba(255,255,255,0.3)':'var(--text-muted)';
 
   useEffect(() => {
-    if (vista !== 'mapa' || !mapContainerRef.current || mapRef.current) return;
-    import('leaflet').then(L => {
-      const lf = L.default;
-      delete (lf.Icon.Default.prototype as any)._getIconUrl;
-      lf.Icon.Default.mergeOptions({ iconRetinaUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png', iconUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png' });
-      const map = lf.map(mapContainerRef.current!, { center: CABORCA_CENTER, zoom: 13 });
-      lf.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' }).addTo(map);
-      reportes.forEach(r => {
-        if (r.lat && r.lng) {
-          lf.circleMarker([r.lat,r.lng], { radius:10, fillColor:TIPO_COLORS[r.tipo]||'#6B7280', color:'white', weight:2, fillOpacity:0.9 })
-            .addTo(map).bindPopup(`<strong>${r.tipo}</strong><br/>${r.descripcion}<br/><small>${r.ubicacion}</small>`);
-        }
-      });
-      mapRef.current = map;
-    });
-    return () => { if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; } };
-  }, [vista, reportes]);
+    fetch(process.env.NEXT_PUBLIC_API_URL+'/reportes?limit=30').then(r=>r.json()).then(d=>setReportes(Array.isArray(d)?d:[])).finally(()=>setIsLoading(false));
+  }, []);
 
-  const enviarReporte = async () => {
-    if (!form.descripcion || !form.ubicacion) { toast.error('Descripción y ubicación requeridas'); return; }
+  const set = (k:string,v:string) => setForm(f=>({...f,[k]:v}));
+
+  const enviar = async () => {
+    if (!form.descripcion||!form.ubicacion) { toast.error('Descripción y ubicación requeridas'); return; }
     setEnviando(true);
     try {
-      const nuevo = await reportesAPI.crear(form);
-      setReportes(prev => [nuevo, ...prev]);
-      setForm({ tipo:'tráfico', descripcion:'', ubicacion:'' });
-      setShowForm(false);
-      toast.success('Reporte enviado. Será revisado por el equipo.');
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL+'/reportes', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(form) });
+      if (!res.ok) throw new Error('Error');
+      toast.success('Reporte enviado, gracias');
+      setShowForm(false); setForm({tipo:'accidente',descripcion:'',ubicacion:'',email_contacto:''});
+      fetch(process.env.NEXT_PUBLIC_API_URL+'/reportes?limit=30').then(r=>r.json()).then(d=>setReportes(Array.isArray(d)?d:[]));
     } catch { toast.error('Error enviando reporte'); }
     finally { setEnviando(false); }
   };
 
-  const inp = "w-full rounded-xl px-4 py-3 text-sm outline-none border bg-white";
-  const inpStyle = { borderColor:'var(--border)', color:'var(--text-primary)' };
+  const inp = { background:card, border:'0.5px solid '+border, borderRadius:'10px', padding:'10px 12px', fontSize:'13px', color:textP, outline:'none', width:'100%' };
 
   return (
     <MainLayout>
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-      <div className="max-w-2xl mx-auto px-3 py-4 space-y-4 pb-24 lg:pb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background:'#FDF1EC' }}>
-              <AlertTriangle className="w-5 h-5" style={{ color:'#C4622D' }} />
-            </div>
-            <div>
-              <h1 className="font-display text-xl font-bold" style={{ color:'var(--desert-blue)' }}>Reportes Ciudadanos</h1>
-              <p className="text-xs" style={{ color:'var(--text-muted)' }}>{reportes.length} reportes activos</p>
-            </div>
+      <div style={{ maxWidth:'640px', margin:'0 auto', padding:'12px', paddingBottom:'88px' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'12px' }}>
+          <div>
+            <h1 style={{ fontSize:'20px', fontWeight:700, fontFamily:'Outfit,sans-serif', color:'var(--text-primary)', marginBottom:'4px' }}>Reportes ciudadanos</h1>
+            <p style={{ fontSize:'12px', color:'var(--text-muted)' }}>Alertas y situaciones en Caborca</p>
           </div>
-          <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium gradient-sunset text-white shadow-sm">
-            {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-            {showForm ? 'Cancelar' : 'Reportar'}
+          <button onClick={()=>setShowForm(!showForm)}
+            style={{ background:showForm?card:'#E05C3A', border:'0.5px solid '+(showForm?border:'#E05C3A'), borderRadius:'10px', padding:'8px 14px', fontSize:'12px', fontWeight:600, color:showForm?textP:'white', cursor:'pointer' }}>
+            {showForm?'Cancelar':'+ Reportar'}
           </button>
         </div>
 
         {showForm && (
-          <div className="bg-white rounded-2xl p-4 border shadow-sm space-y-3 animate-slide-up" style={{ borderColor:'var(--border)' }}>
-            <h3 className="font-semibold text-sm" style={{ color:'var(--text-primary)' }}>Nuevo reporte ciudadano</h3>
-            <div className="flex flex-wrap gap-2">
-              {TIPOS.map(t => (
-                <button key={t} onClick={() => setForm(f => ({ ...f, tipo:t }))}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize transition-all border ${form.tipo === t ? 'text-white border-transparent' : 'bg-white'}`}
-                  style={form.tipo === t ? { background:TIPO_COLORS[t]||'#6B7280' } : { borderColor:'var(--border)', color:'var(--text-secondary)' }}>
-                  {t}
+          <div style={{ background:card, border:'0.5px solid '+border, borderRadius:'14px', padding:'14px', marginBottom:'12px' }}>
+            <div style={{ fontSize:'12px', fontWeight:600, color:textP, marginBottom:'12px', letterSpacing:'0.3px' }}>NUEVO REPORTE</div>
+            <div style={{ display:'flex', gap:'6px', flexWrap:'wrap', marginBottom:'10px' }}>
+              {TIPOS.map(t=>(
+                <button key={t} onClick={()=>set('tipo',t)}
+                  style={{ background: form.tipo===t?TC[t].bg:card, border:'0.5px solid '+(form.tipo===t?TC[t].border:border), borderRadius:'20px', padding:'5px 12px', fontSize:'11px', fontWeight:600, color: form.tipo===t?TC[t].color:textM, cursor:'pointer', display:'flex', alignItems:'center', gap:'4px' }}>
+                  {TIPO_EMOJIS[t]} {t}
                 </button>
               ))}
             </div>
-            <textarea placeholder="¿Qué está pasando?" value={form.descripcion} onChange={e => setForm(f => ({ ...f, descripcion:e.target.value }))}
-              rows={3} className={inp+' resize-none'} style={inpStyle} />
-            <input type="text" placeholder="Ubicación exacta..." value={form.ubicacion} onChange={e => setForm(f => ({ ...f, ubicacion:e.target.value }))} className={inp} style={inpStyle} />
-            <button onClick={enviarReporte} disabled={enviando} className="w-full py-3 rounded-xl gradient-sunset text-white font-medium text-sm disabled:opacity-50">
-              {enviando ? 'Enviando...' : 'Enviar reporte'}
-            </button>
+            <div style={{ display:'flex', flexDirection:'column', gap:'8px' }}>
+              <textarea placeholder="Describe la situación..." value={form.descripcion} onChange={e=>set('descripcion',e.target.value)} rows={3}
+                style={{ ...inp, resize:'none', fontFamily:'inherit' } as any} />
+              <input type="text" placeholder="¿Dónde ocurre? (calle, colonia...)" value={form.ubicacion} onChange={e=>set('ubicacion',e.target.value)} style={inp as any} />
+              <input type="email" placeholder="Email de contacto (opcional)" value={form.email_contacto} onChange={e=>set('email_contacto',e.target.value)} style={inp as any} />
+              <button onClick={enviar} disabled={enviando}
+                style={{ background:'#E05C3A', border:'none', borderRadius:'10px', padding:'11px', fontSize:'13px', fontWeight:600, color:'white', cursor:'pointer', opacity:enviando?0.6:1 }}>
+                {enviando?'Enviando...':'Enviar reporte'}
+              </button>
+            </div>
           </div>
         )}
 
-        <div className="flex gap-2">
-          {[{v:'lista',icon:List,label:'Lista'},{v:'mapa',icon:Map,label:'Mapa'}].map(({ v, icon:Icon, label }) => (
-            <button key={v} onClick={() => setVista(v as any)}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all border ${vista === v ? 'gradient-sunset text-white border-transparent' : 'bg-white'}`}
-              style={vista !== v ? { borderColor:'var(--border)', color:'var(--text-secondary)' } : {}}>
-              <Icon className="w-4 h-4" />{label}
-            </button>
-          ))}
-        </div>
-
-        {vista === 'mapa' && (
-          <div className="rounded-2xl overflow-hidden border shadow-sm" style={{ borderColor:'var(--border)' }}>
-            <div ref={mapContainerRef} style={{ height:'350px' }} />
+        {isLoading ? (
+          <div style={{ display:'flex', flexDirection:'column', gap:'6px' }}>
+            {[...Array(4)].map((_,i)=><div key={i} style={{ background:card, border:'0.5px solid '+border, borderRadius:'12px', height:'72px', opacity:0.4 }} />)}
           </div>
-        )}
-
-        {vista === 'lista' && (
-          <div className="space-y-3">
-            {reportes.length === 0 ? (
-              <div className="bg-white rounded-2xl p-8 text-center border shadow-sm" style={{ borderColor:'var(--border)' }}>
-                <AlertTriangle className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-                <div className="text-sm" style={{ color:'var(--text-muted)' }}>No hay reportes activos</div>
-              </div>
-            ) : reportes.map(r => (
-              <div key={r.id} className="bg-white rounded-2xl p-4 border shadow-sm" style={{ borderColor:'var(--border)' }}>
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background:(TIPO_COLORS[r.tipo]||'#6B7280')+'20' }}>
-                    <AlertTriangle className="w-4 h-4" style={{ color:TIPO_COLORS[r.tipo]||'#6B7280' }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold capitalize px-2 py-0.5 rounded-full text-white" style={{ background:TIPO_COLORS[r.tipo]||'#6B7280' }}>{r.tipo}</span>
-                      <span className="text-xs flex items-center gap-1" style={{ color:'var(--text-muted)' }}>
-                        <Clock className="w-3 h-3" />{formatDistanceToNow(new Date(r.created_at), { addSuffix:true, locale:es })}
-                      </span>
-                    </div>
-                    <p className="text-sm" style={{ color:'var(--text-primary)' }}>{r.descripcion}</p>
-                    <div className="flex items-center gap-1 mt-1 text-xs" style={{ color:'var(--text-muted)' }}><MapPin className="w-3 h-3" />{r.ubicacion}</div>
-                    <div className="mt-2">
-                      <ShareWhatsApp texto={`⚠️ Reporte en Caborca: [${r.tipo.toUpperCase()}] ${r.descripcion} 📍 ${r.ubicacion}`} url="https://caborca.app/reportes" />
+        ) : reportes.length===0 ? (
+          <div style={{ textAlign:'center', padding:'40px', color:'var(--text-muted)', fontSize:'13px' }}>No hay reportes activos</div>
+        ) : (
+          <div style={{ display:'flex', flexDirection:'column', gap:'6px' }}>
+            {reportes.map(r => {
+              const col = TC[r.tipo]||TC.otro;
+              return (
+                <div key={r.id} style={{ background:col.bg, border:'0.5px solid '+col.border, borderRadius:'12px', padding:'12px 14px', borderLeft:'3px solid '+col.color }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'4px' }}>
+                    <span style={{ fontSize:'16px' }}>{TIPO_EMOJIS[r.tipo]||'📋'}</span>
+                    <span style={{ fontSize:'10px', fontWeight:700, color:col.color, textTransform:'uppercase', letterSpacing:'0.5px' }}>{r.tipo}</span>
+                    <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:'4px' }}>
+                      {r.estado==='aprobado' && <div style={{ width:'5px', height:'5px', background:'#4ADE80', borderRadius:'50%' }} />}
+                      <span style={{ fontSize:'10px', color:textM }}>{formatDistanceToNow(new Date(r.created_at),{addSuffix:true,locale:es})}</span>
                     </div>
                   </div>
+                  <div style={{ fontSize:'12px', fontWeight:600, color:col.color }}>{r.descripcion}</div>
+                  <div style={{ fontSize:'11px', color:col.color, opacity:0.6, marginTop:'3px' }}>📍 {r.ubicacion}</div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

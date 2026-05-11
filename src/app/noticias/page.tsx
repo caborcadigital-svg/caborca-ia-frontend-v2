@@ -3,71 +3,92 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import MainLayout from '../MainLayout';
 import { noticiasAPI } from '../../lib/api';
-import { Newspaper, ChevronRight } from 'lucide-react';
-import ShareWhatsApp from '../../components/ShareWhatsApp';
+import { useDarkMode } from '../../hooks/useDarkMode';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { Search } from 'lucide-react';
 
-const CATEGORIAS = ['todas','general','seguridad','deportes','gobierno','cultura','economia'];
+const CATEGORIAS = ['todas','local','gobierno','deportes','cultura','economia','seguridad'];
 
 export default function NoticiasPage() {
   const [noticias, setNoticias] = useState<any[]>([]);
-  const [categoria, setCategoria] = useState('todas');
+  const [filtro, setFiltro] = useState('todas');
+  const [busqueda, setBusqueda] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const { dark } = useDarkMode();
 
   useEffect(() => {
-    setIsLoading(true);
-    noticiasAPI.getAll({ categoria: categoria === 'todas' ? undefined : categoria }).then(setNoticias).finally(() => setIsLoading(false));
-  }, [categoria]);
+    noticiasAPI.getAll().then(setNoticias).finally(()=>setIsLoading(false));
+  }, []);
+
+  const filtradas = noticias.filter(n => {
+    const matchCat = filtro==='todas' || n.categoria?.toLowerCase()===filtro;
+    const matchQ = !busqueda || n.titulo.toLowerCase().includes(busqueda.toLowerCase());
+    return matchCat && matchQ;
+  });
+
+  const card = dark?'rgba(255,255,255,0.03)':'var(--card)';
+  const border = dark?'rgba(255,255,255,0.08)':'var(--border)';
+  const textP = dark?'rgba(255,255,255,0.85)':'var(--text-primary)';
+  const textM = dark?'rgba(255,255,255,0.3)':'var(--text-muted)';
 
   return (
     <MainLayout>
-      <div className="max-w-2xl mx-auto px-3 py-4 space-y-4 pb-24 lg:pb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background:'#F3EEF9' }}>
-            <Newspaper className="w-5 h-5" style={{ color:'#6B3FA0' }} />
-          </div>
-          <div>
-            <h1 className="font-display text-xl font-bold" style={{ color:'var(--desert-blue)' }}>Noticias de Caborca</h1>
-            <p className="text-xs" style={{ color:'var(--text-muted)' }}>Información local al día</p>
-          </div>
+      <div style={{ maxWidth:'640px', margin:'0 auto', padding:'12px', paddingBottom:'88px' }}>
+        <div style={{ marginBottom:'12px' }}>
+          <h1 style={{ fontSize:'20px', fontWeight:700, fontFamily:'Outfit,sans-serif', color:'var(--text-primary)', marginBottom:'4px' }}>Noticias</h1>
+          <p style={{ fontSize:'12px', color:'var(--text-muted)' }}>Lo más reciente de Heroica Caborca</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div style={{ position:'relative', marginBottom:'10px' }}>
+          <Search size={14} style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', color:'var(--text-muted)' }} />
+          <input type="text" placeholder="Buscar noticias..." value={busqueda} onChange={e=>setBusqueda(e.target.value)}
+            style={{ width:'100%', background:card, border:'0.5px solid '+border, borderRadius:'10px', padding:'9px 12px 9px 32px', fontSize:'13px', color:textP, outline:'none' }} />
+        </div>
+        <div style={{ display:'flex', gap:'6px', overflowX:'auto', marginBottom:'12px', paddingBottom:'2px' }}>
           {CATEGORIAS.map(cat => (
-            <button key={cat} onClick={() => setCategoria(cat)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize transition-all border ${categoria === cat ? 'gradient-sunset text-white border-transparent' : 'bg-white'}`}
-              style={categoria !== cat ? { borderColor:'var(--border)', color:'var(--text-secondary)' } : {}}>
+            <button key={cat} onClick={()=>setFiltro(cat)}
+              style={{ background: filtro===cat?'#E05C3A':card, color: filtro===cat?'white':textM, border:'0.5px solid '+(filtro===cat?'#E05C3A':border), borderRadius:'20px', padding:'5px 12px', fontSize:'11px', fontWeight:600, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0, textTransform:'capitalize', letterSpacing:'0.2px' }}>
               {cat}
             </button>
           ))}
         </div>
         {isLoading ? (
-          <div className="space-y-3">{[...Array(4)].map((_,i) => <div key={i} className="bg-white rounded-2xl p-4 border animate-pulse h-32" style={{ borderColor:'var(--border)' }} />)}</div>
-        ) : noticias.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center border shadow-sm" style={{ borderColor:'var(--border)' }}>
-            <Newspaper className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-            <div className="text-sm" style={{ color:'var(--text-muted)' }}>No hay noticias en esta categoría</div>
+          <div style={{ display:'flex', flexDirection:'column', gap:'8px' }}>
+            {[...Array(4)].map((_,i)=>(
+              <div key={i} style={{ background:card, border:'0.5px solid '+border, borderRadius:'14px', padding:'12px', height:'80px', opacity:0.5 }} />
+            ))}
           </div>
+        ) : filtradas.length===0 ? (
+          <div style={{ textAlign:'center', padding:'40px 20px', color:'var(--text-muted)', fontSize:'13px' }}>No hay noticias para mostrar</div>
         ) : (
-          <div className="space-y-3">
-            {noticias.map(n => (
-              <div key={n.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden">
-                {n.imagen_url && <img src={n.imagen_url} alt={n.titulo} className="w-full h-40 object-cover" />}
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold uppercase" style={{ color:'var(--terracotta)' }}>{n.categoria}</span>
-                    <span className="text-xs" style={{ color:'var(--text-muted)' }}>{formatDistanceToNow(new Date(n.created_at), { addSuffix:true, locale:es })}</span>
-                  </div>
-                  <h2 className="font-bold text-sm mb-1" style={{ color:'var(--text-primary)' }}>{n.titulo}</h2>
-                  {n.resumen && <p className="text-xs mb-3 line-clamp-2" style={{ color:'var(--text-secondary)' }}>{n.resumen}</p>}
-                  <div className="flex items-center justify-between">
-                    <Link href={`/noticias/${n.id}`} className="flex items-center gap-1 text-xs font-medium" style={{ color:'var(--terracotta)' }}>
-                      Leer más <ChevronRight className="w-3 h-3" />
-                    </Link>
-                    <ShareWhatsApp texto={`📰 ${n.titulo}`} url={`https://caborca.app/noticias/${n.id}`} />
-                  </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:'6px' }}>
+            {filtradas.map((n,i) => (
+              <Link key={n.id} href={'/noticias/'+n.id} style={{ textDecoration:'none', display:'block' }}>
+                <div style={{ background:card, border:'0.5px solid '+border, borderRadius:'14px', overflow:'hidden', display:'flex', gap:'0', transition:'opacity 0.2s' }}>
+                  {i===0 && n.imagen_url ? (
+                    <div style={{ display:'flex', flexDirection:'column' }}>
+                      <img src={n.imagen_url} alt={n.titulo} style={{ width:'100%', height:'160px', objectFit:'cover' }} />
+                      <div style={{ padding:'12px' }}>
+                        <div style={{ fontSize:'9px', color:'#E05C3A', fontWeight:600, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:'4px' }}>{n.categoria}</div>
+                        <div style={{ fontSize:'14px', fontWeight:600, color:textP, lineHeight:1.35, marginBottom:'6px' }}>{n.titulo}</div>
+                        <div style={{ fontSize:'10px', color:textM }}>{formatDistanceToNow(new Date(n.created_at),{addSuffix:true,locale:es})}</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display:'flex', gap:'10px', padding:'10px 12px', alignItems:'center', width:'100%' }}>
+                      {n.imagen_url
+                        ? <img src={n.imagen_url} alt={n.titulo} style={{ width:'52px', height:'52px', borderRadius:'10px', objectFit:'cover', flexShrink:0 }} />
+                        : <div style={{ width:'52px', height:'52px', background:'var(--sand-dark)', borderRadius:'10px', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'20px' }}>📰</div>
+                      }
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:'9px', color:'#E05C3A', fontWeight:600, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:'2px' }}>{n.categoria}</div>
+                        <div style={{ fontSize:'12px', fontWeight:600, color:textP, lineHeight:1.3, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' } as any}>{n.titulo}</div>
+                        <div style={{ fontSize:'10px', color:textM, marginTop:'3px' }}>{formatDistanceToNow(new Date(n.created_at),{addSuffix:true,locale:es})}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
