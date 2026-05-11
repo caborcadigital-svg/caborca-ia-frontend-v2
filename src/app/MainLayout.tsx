@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle, AlertCircle, Activity, MapPin, Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone, Moon, Sun, BarChart2, Settings, Users } from 'lucide-react';
+import { MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle, AlertCircle, Activity, MapPin, Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone, Moon, Sun, BarChart2, Settings, Users, Brain  } from 'lucide-react';
 import { useAuthStore } from '../hooks/useAuth';
 import { useDarkMode } from '../hooks/useDarkMode';
 import GlobalSearch from '../components/GlobalSearch';
@@ -37,6 +37,8 @@ const ADMIN_NAV_BASE = [
   { href:'/admin/config', label:'Configuracion', icon:Settings, roles:['superadmin'] },
   { href:'/admin/emergencias', label:'Emergencias', icon:AlertCircle, roles:['superadmin','admin'] },
   { href:'/admin/logs', label:'Logs de actividad', icon:Activity, roles:['superadmin'] },
+  { href:'/admin/conocimiento', label:'Conocimiento IA', icon:Brain, roles:['superadmin','admin'] },
+
 ];
 
 function LogoIcon({ size = 36 }: { size?: number }) {
