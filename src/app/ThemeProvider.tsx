@@ -6,31 +6,46 @@ export default function ThemeProvider() {
     const API = process.env.NEXT_PUBLIC_API_URL || '';
     fetch(API + '/config').then(r => r.json()).then(config => {
       if (!config || !Object.keys(config).length) return;
+
+      const isDark = localStorage.getItem('caborca_dark_mode') === 'true';
       const root = document.documentElement;
-      const map: Record<string,string> = {
+
+      const sidebarMap: Record<string,string> = {
+        color_sidebar_from: '--sidebar-from',
+        color_sidebar_to: '--sidebar-to',
+      };
+
+      const colorMap: Record<string,string> = {
         color_primary: '--terracotta',
         color_secondary: '--sunset-orange',
         color_accent: '--desert-gold',
+      };
+
+      const bgColorMap: Record<string,string> = {
         color_surface: '--surface',
         color_sand: '--sand',
         color_text: '--text-primary',
         color_muted: '--text-muted',
         color_border: '--border',
       };
-      Object.entries(map).forEach(function(entry) {
-        const k = entry[0]; const v = entry[1];
+
+      Object.entries(colorMap).forEach(([k, v]) => {
         if (config[k]) root.style.setProperty(v, config[k]);
       });
+
+      if (!isDark) {
+        Object.entries(bgColorMap).forEach(([k, v]) => {
+          if (config[k]) root.style.setProperty(v, config[k]);
+        });
+      }
+
       if (config.color_sidebar_from && config.color_sidebar_to) {
-        const style = document.getElementById('caborca-sidebar-style') || document.createElement('style');
-        style.id = 'caborca-sidebar-style';
+        const styleId = 'caborca-sidebar-style';
+        let style = document.getElementById(styleId) as HTMLStyleElement;
+        if (!style) { style = document.createElement('style'); style.id = styleId; document.head.appendChild(style); }
         style.textContent = '.sidebar-desert { background: linear-gradient(180deg, ' + config.color_sidebar_from + ' 0%, ' + config.color_sidebar_to + ' 100%) !important; }';
-        if (!document.getElementById('caborca-sidebar-style')) document.head.appendChild(style);
       }
-      if (config.color_text) {
-        root.style.setProperty('--text-secondary', config.color_text + 'CC');
-      }
-    }).catch(function() {});
+    }).catch(() => {});
   }, []);
 
   return null;
