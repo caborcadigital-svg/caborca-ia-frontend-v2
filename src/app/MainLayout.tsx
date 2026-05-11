@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle, Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone, Moon, Sun, BarChart2, Settings, Users } from 'lucide-react';
+import { MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle, AlertCircle, Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone, Moon, Sun, BarChart2, Settings, Users } from 'lucide-react';Right, Megaphone, Moon, Sun, BarChart2, Settings, Users } from 'lucide-react';
 import { useAuthStore } from '../hooks/useAuth';
 import { useDarkMode } from '../hooks/useDarkMode';
 import GlobalSearch from '../components/GlobalSearch';
