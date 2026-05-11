@@ -35,6 +35,7 @@ const ADMIN_NAV_BASE = [
   { href:'/admin/usuarios', label:'Colaboradores', icon:Users, roles:['superadmin'] },
   { href:'/admin/config', label:'Configuracion', icon:Settings, roles:['superadmin'] },
   { href:'/admin/emergencias', label:'Emergencias', icon:AlertCircle, roles:['superadmin','admin'] },
+  { href:'/admin/logs', label:'Logs de actividad', icon:Activity, roles:['superadmin'] },
 ];
 
 function LogoIcon({ size = 36 }: { size?: number }) {
