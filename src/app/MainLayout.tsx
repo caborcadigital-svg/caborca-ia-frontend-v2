@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle, AlertCircle, Activity, Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone, Moon, Sun, BarChart2, Settings, Users } from 'lucide-react';
+import { MessageSquare, Cloud, Newspaper, CalendarDays, AlertTriangle, AlertCircle, Activity, MapPin, Trophy, Store, LayoutDashboard, Menu, X, LogOut, ChevronRight, Megaphone, Moon, Sun, BarChart2, Settings, Users } from 'lucide-react';
 import { useAuthStore } from '../hooks/useAuth';
 import { useDarkMode } from '../hooks/useDarkMode';
 import GlobalSearch from '../components/GlobalSearch';
@@ -17,11 +17,8 @@ const NAV = [
   { href:'/reportes', label:'Reportes', icon:AlertTriangle, tour:'reportes' },
   { href:'/deportes', label:'Deportes', icon:Trophy, tour:'deportes' },
   { href:'/negocios', label:'Negocios', icon:Store, tour:'negocios' },
+  { href:'/mapa', label:'Mapa', icon:MapPin },
   { href:'/emergencias', label:'Emergencias', icon:AlertCircle },
-{ href:'/sugerir-noticia', label:'Sugerir noticia', icon:Newspaper },
-{ href:'/mapa', label:'Mapa', icon:Map },
-
-
 ];
 
 const ADMIN_NAV_BASE = [
@@ -83,16 +80,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background:'var(--sand)' }}>
-      {/* Overlay — z-index 50 cubre el BottomNav (z-35) */}
       <div
         className={clsx('fixed inset-0 transition-opacity', open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none')}
-        style={{ background:'rgba(0,0,0,0.6)', zIndex: 50 }}
+        style={{ background:'rgba(0,0,0,0.6)', zIndex:50 }}
         onClick={() => setOpen(false)}
       />
-
-      {/* Sidebar — z-index 60 encima del overlay */}
       <aside className={clsx('fixed top-0 left-0 h-full flex flex-col sidebar-desert w-[260px] transition-transform duration-300 ease-in-out', open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')}
-        style={{ zIndex: 60 }}>
+        style={{ zIndex:60 }}>
         <div className="flex items-center gap-3 px-4 py-4 border-b border-white/10">
           <LogoIcon size={40} />
           <div><div className="font-display font-bold text-white text-base leading-tight">Caborca IA</div><div className="text-xs text-white/50">Tu asistente inteligente</div></div>
@@ -158,11 +152,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           )}
         </div>
       </aside>
-
       <div className="flex-1 flex flex-col min-w-0 lg:pl-[260px]">
-        {/* Header — z-index 45, encima del BottomNav pero debajo del sidebar */}
         <header className="flex items-center gap-3 px-4 py-2.5 border-b sticky top-0 backdrop-blur-sm"
-          style={{ borderColor:'var(--border)', background:'var(--surface)', zIndex: 45, opacity: 0.97 }}>
+          style={{ borderColor:'var(--border)', background:'var(--surface)', zIndex:45 }}>
           <button onClick={() => setOpen(true)} className="lg:hidden" style={{ color:'var(--desert-blue)' }}><Menu className="w-5 h-5" /></button>
           <div className="flex items-center gap-2 lg:hidden"><LogoIcon size={30} /><span className="font-display font-bold text-sm" style={{ color:'var(--desert-blue)' }}>{enAdmin ? 'Admin' : 'Caborca IA'}</span></div>
           <div className="flex-1 flex items-center justify-end gap-2">

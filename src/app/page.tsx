@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Cloud, Newspaper, CalendarDays, AlertTriangle, Trophy, Store, MessageSquare, Star, ChevronRight, Map } from 'lucide-react';
+import { Cloud, Newspaper, CalendarDays, AlertTriangle, Trophy, Store, MessageSquare, Star, ChevronRight, MapPin } from 'lucide-react';
 import MainLayout from './MainLayout';
 import PullToRefresh from '../components/PullToRefresh';
 import { climaAPI, noticiasAPI, eventosAPI, deportesAPI, negociosAPI } from '../lib/api';
@@ -27,7 +27,7 @@ const ACCESOS = [
   { href:'/reportes', label:'Reportes', icon:AlertTriangle, color:'#C4622D', bg:'#FDF1EC' },
   { href:'/deportes', label:'Deportes', icon:Trophy, color:'#E8823A', bg:'#FEF0E8' },
   { href:'/negocios', label:'Negocios', icon:Store, color:'#2D5F8A', bg:'#EEF4F9' },
-  { href:'/mapa', label:'Mapa', icon:Map, color:'#4A7C59', bg:'#EEF5F0' },
+  { href:'/mapa', label:'Mapa', icon:MapPin, color:'#4A7C59', bg:'#EEF5F0' },
 ];
 
 const REPORTE_COLORES: Record<string,{bg:string,color:string,border:string}> = {
@@ -91,7 +91,7 @@ export default function HomePage() {
       <PullToRefresh onRefresh={cargarDatos}>
         <div style={{ background:'var(--sand)', minHeight:'100vh', paddingBottom:'80px' }}>
 
-          <div className="p-3 pb-0" style={getHeroBg()}>
+          <div style={{ ...getHeroBg(), padding:'12px 12px 0' }}>
             <div style={{ paddingTop:'8px', paddingBottom:'16px' }}>
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'12px' }}>
                 <div>
@@ -109,11 +109,10 @@ export default function HomePage() {
                   </div>
                 )}
               </div>
-
               <div style={{ display:'flex', gap:'8px', overflowX:'auto', paddingBottom:'4px' }}>
-                {['noticias','reportes','deportes'].map(t => (
-                  <button key={t} onClick={() => setTab(t as any)}
-                    style={{ background: tab===t ? 'white' : 'rgba(255,255,255,0.15)', color: tab===t ? '#1E3A5F' : 'white', border:'none', borderRadius:'20px', padding:'5px 14px', fontSize:'12px', fontWeight:600, cursor:'pointer', whiteSpace:'nowrap', textTransform:'capitalize', flexShrink:0 }}>
+                {(['noticias','reportes','deportes'] as const).map(t => (
+                  <button key={t} onClick={() => setTab(t)}
+                    style={{ background: tab===t ? 'white' : 'rgba(255,255,255,0.15)', color: tab===t ? '#1E3A5F' : 'white', border:'none', borderRadius:'20px', padding:'5px 14px', fontSize:'12px', fontWeight:600, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}>
                     {t === 'noticias' ? '📰 Noticias' : t === 'reportes' ? '🚨 Reportes' : '🏆 Deportes'}
                   </button>
                 ))}
@@ -124,13 +123,13 @@ export default function HomePage() {
           <div style={{ padding:'12px' }}>
 
             {banner && (
-              <div style={{ background:'white', borderRadius:'14px', padding:'10px 12px', display:'flex', alignItems:'center', gap:'10px', marginBottom:'12px', border:'1px solid var(--border)' }}>
+              <div style={{ background:'var(--card)', borderRadius:'14px', padding:'10px 12px', display:'flex', alignItems:'center', gap:'10px', marginBottom:'12px', border:'1px solid var(--border)' }}>
                 {banner.imagen_url && <img src={banner.imagen_url} alt={banner.titulo} style={{ width:'36px', height:'36px', borderRadius:'8px', objectFit:'cover', flexShrink:0 }} />}
                 <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize:'11px', fontWeight:700, color: banner.color||'#E05C3A', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{banner.titulo}</div>
+                  <div style={{ fontSize:'11px', fontWeight:700, color:banner.color||'#E05C3A', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{banner.titulo}</div>
                   {banner.subtitulo && <div style={{ fontSize:'10px', color:'var(--text-muted)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{banner.subtitulo}</div>}
                 </div>
-                {banner.link_url && <a href={banner.link_url} target="_blank" rel="noopener noreferrer" style={{ fontSize:'11px', fontWeight:700, color: banner.color||'#E05C3A', flexShrink:0 }}>Ver →</a>}
+                {banner.link_url && <a href={banner.link_url} target="_blank" rel="noopener noreferrer" style={{ fontSize:'11px', fontWeight:700, color:banner.color||'#E05C3A', flexShrink:0 }}>Ver →</a>}
               </div>
             )}
 
@@ -152,15 +151,12 @@ export default function HomePage() {
                   <span style={{ fontSize:'12px', fontWeight:700, color:'var(--text-primary)', textTransform:'uppercase', letterSpacing:'0.5px' }}>📰 Últimas noticias</span>
                   <Link href="/noticias" style={{ fontSize:'11px', color:'var(--terracotta)', fontWeight:600, textDecoration:'none' }}>Ver todas →</Link>
                 </div>
-
                 {noticiaDestacada && (
                   <Link href={'/noticias/'+noticiaDestacada.id} style={{ display:'block', textDecoration:'none', marginBottom:'10px' }}>
                     <div style={{ borderRadius:'16px', overflow:'hidden', background:'var(--card)', border:'1px solid var(--border)' }}>
                       {noticiaDestacada.imagen_url
                         ? <img src={noticiaDestacada.imagen_url} alt={noticiaDestacada.titulo} style={{ width:'100%', height:'160px', objectFit:'cover' }} />
-                        : <div style={{ height:'120px', background:'linear-gradient(135deg,#1E3A5F,#6B3FA0)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                            <span style={{ fontSize:'40px' }}>📰</span>
-                          </div>
+                        : <div style={{ height:'120px', background:'linear-gradient(135deg,#1E3A5F,#6B3FA0)', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontSize:'40px' }}>📰</span></div>
                       }
                       <div style={{ padding:'12px' }}>
                         <div style={{ fontSize:'10px', fontWeight:700, color:'var(--terracotta)', textTransform:'uppercase', marginBottom:'4px' }}>{noticiaDestacada.categoria}</div>
@@ -170,7 +166,6 @@ export default function HomePage() {
                     </div>
                   </Link>
                 )}
-
                 <div style={{ display:'flex', flexDirection:'column', gap:'8px' }}>
                   {noticiasResto.map(n => (
                     <Link key={n.id} href={'/noticias/'+n.id} style={{ display:'flex', gap:'10px', background:'var(--card)', borderRadius:'14px', padding:'10px', border:'1px solid var(--border)', textDecoration:'none', alignItems:'center' }}>
@@ -180,7 +175,7 @@ export default function HomePage() {
                       }
                       <div style={{ flex:1, minWidth:0 }}>
                         <div style={{ fontSize:'10px', fontWeight:700, color:'var(--terracotta)', textTransform:'uppercase' }}>{n.categoria}</div>
-                        <div style={{ fontSize:'12px', fontWeight:600, color:'var(--text-primary)', lineHeight:1.3, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{n.titulo}</div>
+                        <div style={{ fontSize:'12px', fontWeight:600, color:'var(--text-primary)', lineHeight:1.3, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' } as any}>{n.titulo}</div>
                         <div style={{ fontSize:'10px', color:'var(--text-muted)', marginTop:'3px' }}>{formatDistanceToNow(new Date(n.created_at),{addSuffix:true,locale:es})}</div>
                       </div>
                       <ChevronRight size={14} color="var(--text-muted)" style={{ flexShrink:0 }} />
@@ -197,9 +192,7 @@ export default function HomePage() {
                   <Link href="/reportes" style={{ fontSize:'11px', color:'var(--terracotta)', fontWeight:600, textDecoration:'none' }}>Ver todos →</Link>
                 </div>
                 {reportes.length === 0 ? (
-                  <div style={{ background:'var(--card)', borderRadius:'16px', padding:'24px', textAlign:'center', border:'1px solid var(--border)', color:'var(--text-muted)', fontSize:'13px' }}>
-                    Sin reportes activos ahora mismo
-                  </div>
+                  <div style={{ background:'var(--card)', borderRadius:'16px', padding:'24px', textAlign:'center', border:'1px solid var(--border)', color:'var(--text-muted)', fontSize:'13px' }}>Sin reportes activos ahora mismo</div>
                 ) : reportes.map(r => {
                   const col = REPORTE_COLORES[r.tipo] || REPORTE_COLORES.otro;
                   return (
@@ -207,10 +200,10 @@ export default function HomePage() {
                       <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'4px' }}>
                         <span style={{ fontSize:'16px' }}>{TIPO_EMOJIS[r.tipo]||'📋'}</span>
                         <span style={{ fontSize:'11px', fontWeight:700, color:col.color, textTransform:'uppercase' }}>{r.tipo}</span>
-                        <span style={{ fontSize:'10px', color:'var(--text-muted)', marginLeft:'auto' }}>{formatDistanceToNow(new Date(r.created_at),{addSuffix:true,locale:es})}</span>
+                        <span style={{ fontSize:'10px', color:'#6B7280', marginLeft:'auto' }}>{formatDistanceToNow(new Date(r.created_at),{addSuffix:true,locale:es})}</span>
                       </div>
-                      <div style={{ fontSize:'12px', fontWeight:600, color:'var(--text-primary)' }}>{r.descripcion}</div>
-                      <div style={{ fontSize:'11px', color:'var(--text-muted)', marginTop:'3px' }}>📍 {r.ubicacion}</div>
+                      <div style={{ fontSize:'12px', fontWeight:600, color:'#1A1A2E' }}>{r.descripcion}</div>
+                      <div style={{ fontSize:'11px', color:'#6B7280', marginTop:'3px' }}>📍 {r.ubicacion}</div>
                     </div>
                   );
                 })}
@@ -227,9 +220,7 @@ export default function HomePage() {
                   <Link href="/deportes" style={{ fontSize:'11px', color:'var(--terracotta)', fontWeight:600, textDecoration:'none' }}>Ver todos →</Link>
                 </div>
                 {partidos.length === 0 ? (
-                  <div style={{ background:'var(--card)', borderRadius:'16px', padding:'24px', textAlign:'center', border:'1px solid var(--border)', color:'var(--text-muted)', fontSize:'13px' }}>
-                    Sin partidos recientes
-                  </div>
+                  <div style={{ background:'var(--card)', borderRadius:'16px', padding:'24px', textAlign:'center', border:'1px solid var(--border)', color:'var(--text-muted)', fontSize:'13px' }}>Sin partidos recientes</div>
                 ) : partidos.map(p => (
                   <div key={p.id} style={{ background:'var(--card)', borderRadius:'14px', padding:'12px', marginBottom:'8px', border:'1px solid var(--border)' }}>
                     <div style={{ fontSize:'10px', color:'var(--text-muted)', textAlign:'center', marginBottom:'8px' }}>⚾ {p.liga} · {p.deporte}</div>
@@ -251,7 +242,7 @@ export default function HomePage() {
 
             <Link href="/mapa" style={{ display:'flex', alignItems:'center', gap:'12px', background:'var(--card)', borderRadius:'16px', padding:'14px', border:'1px solid var(--border)', textDecoration:'none', marginBottom:'12px' }}>
               <div style={{ width:'44px', height:'44px', borderRadius:'14px', background:'linear-gradient(135deg,#1E3A5F,#4A7C59)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                <Map size={22} color="white" />
+                <MapPin size={22} color="white" />
               </div>
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:'14px', fontWeight:700, color:'var(--text-primary)' }}>Mapa en vivo de Caborca</div>
